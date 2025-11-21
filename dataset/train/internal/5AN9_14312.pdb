@@ -1,0 +1,675 @@
+SEQRES   1 A  398  MET SER HIS ARG LYS PHE GLU ALA PRO ARG HIS GLY ASN
+SEQRES   2 A  398  LEU GLY PHE ARG PRO ARG LYS ARG ALA ALA ARG HIS GLN
+SEQRES   3 A  398  GLY LYS VAL LYS SER PHE PRO LYS ASP ASP ARG THR GLN
+SEQRES   4 A  398  LYS VAL HIS LEU THR ALA PHE MET GLY TYR LYS ALA GLY
+SEQRES   5 A  398  MET THR HIS VAL VAL ARG ASP LEU GLU LYS PRO GLY SER
+SEQRES   6 A  398  LYS MET HIS LYS LYS GLU ILE VAL GLU ALA VAL THR ILE
+SEQRES   7 A  398  ILE GLU CYS PRO PRO MET TYR ILE VAL GLY LEU VAL GLY
+SEQRES   8 A  398  TYR VAL GLU THR ALA GLN GLY LEU LYS THR TYR LYS THR
+SEQRES   9 A  398  VAL TRP ALA GLN HIS LEU SER ASP ASN PHE ARG ARG ARG
+SEQRES  10 A  398  LEU TYR LYS ASN TRP TYR LYS SER LYS SER LYS LYS ALA
+SEQRES  11 A  398  PHE THR LYS TYR VAL LYS GLN TYR GLU THR GLU GLU GLY
+SEQRES  12 A  398  LYS LYS SER ILE GLU ALA SER LEU GLN ALA ILE LYS LYS
+SEQRES  13 A  398  ARG CYS SER VAL VAL ARG VAL ILE ALA HIS THR GLN VAL
+SEQRES  14 A  398  HIS LYS LEU LYS LEU THR GLN LYS LYS ALA HIS VAL LEU
+SEQRES  15 A  398  GLU ILE GLN VAL ASN GLY GLY SER ILE VAL GLU LYS VAL
+SEQRES  16 A  398  ASN PHE ALA VAL ALA ASN PHE GLU LYS THR VAL ASN VAL
+SEQRES  17 A  398  THR GLY VAL PHE ALA GLU ASN GLU LEU ILE ASP VAL ILE
+SEQRES  18 A  398  GLY VAL THR LYS GLY LYS GLY PHE ASN GLY VAL ILE LYS
+SEQRES  19 A  398  ARG TRP GLY VAL ARG LYS LEU PRO ARG LYS THR HIS LYS
+SEQRES  20 A  398  GLY LEU ARG LYS VAL ALA CYS ILE GLY ALA TRP HIS PRO
+SEQRES  21 A  398  SER ARG VAL SER THR THR VAL PRO ARG ALA GLY GLN LEU
+SEQRES  22 A  398  GLY TYR HIS HIS ARG VAL GLU ARG ASN LYS LYS ILE TYR
+SEQRES  23 A  398  ARG ILE GLY GLN ALA GLN PRO GLU ASP GLY LYS GLN ILE
+SEQRES  24 A  398  SER THR GLY LYS THR GLU PHE ASP LEU THR GLU LYS THR
+SEQRES  25 A  398  ILE ASN PRO MET GLY GLY PHE ALA HIS TYR GLY MET VAL
+SEQRES  26 A  398  LYS HIS GLU PHE LEU MET LEU LYS GLY CYS VAL ALA GLY
+SEQRES  27 A  398  PRO ARG LYS ARG ALA LEU THR LEU ARG LYS SER ILE THR
+SEQRES  28 A  398  THR GLN THR GLY ARG ALA ALA LEU GLU LYS ILE THR LEU
+SEQRES  29 A  398  LYS PHE ILE ASP THR SER SER LYS PHE GLY HIS GLY LEU
+SEQRES  30 A  398  HIS GLN THR ALA GLU ASP LYS THR LYS TYR PHE GLY VAL
+SEQRES  31 A  398  LYS LYS SER ARG SER THR LYS ALA
+SEQRES   1 B  188  MET LYS VAL ILE ASN SER SER ARG LYS VAL GLN ILE PRO
+SEQRES   2 B  188  GLU ASN VAL THR VAL ASP VAL LYS GLY ARG SER VAL LYS
+SEQRES   3 B  188  VAL THR GLY PRO ARG GLY THR LEU SER LYS SER PHE ASP
+SEQRES   4 B  188  HIS ALA SER VAL ASP ILE ASN LEU VAL GLY LYS LYS GLU
+SEQRES   5 B  188  LEU THR VAL ASP LEU TRP PHE GLY ASN ARG LYS GLN ILE
+SEQRES   6 B  188  ALA CYS ILE LYS THR ILE THR SER ILE ILE GLU ASN MET
+SEQRES   7 B  188  ILE THR GLY VAL THR LYS GLY TYR GLU TYR LYS MET ARG
+SEQRES   8 B  188  PHE VAL TYR ALA HIS PHE PRO ILE ASN VAL ALA VAL THR
+SEQRES   9 B  188  ASP GLY GLY ARG VAL VAL GLU ILE ARG ASN PHE PHE GLY
+SEQRES  10 B  188  GLU LYS ILE VAL ARG ARG ILE GLU LEU LEU ASP GLY ILE
+SEQRES  11 B  188  THR CYS TYR ARG ASN GLU LYS ALA LYS ASP GLU ILE VAL
+SEQRES  12 B  188  LEU THR GLY ASN SER LEU GLU LEU LEU SER GLN SER CYS
+SEQRES  13 B  188  ALA THR ILE GLN LEU ARG SER ALA ILE LYS TYR LYS ASP
+SEQRES  14 B  188  VAL ARG LYS PHE LEU ASP GLY ILE TYR VAL SER GLU ARG
+SEQRES  15 B  188  ASN VAL LEU GLU SER ASN
+SEQRES   1 C  205  MET SER GLY ALA GLY SER LYS ARG LYS ASN VAL PHE ILE
+SEQRES   2 C  205  GLU LYS ALA THR LYS LEU PHE THR THR TYR ASP LYS MET
+SEQRES   3 C  205  ILE VAL ALA GLU ALA ASP PHE VAL GLY SER SER GLN LEU
+SEQRES   4 C  205  GLN LYS ILE ARG LYS SER ILE ARG GLY ILE GLY ALA VAL
+SEQRES   5 C  205  LEU MET GLY LYS LYS THR MET ILE ARG LYS VAL ILE ARG
+SEQRES   6 C  205  ASP LEU ALA ASP SER LYS PRO GLU LEU ASP ALA LEU ASN
+SEQRES   7 C  205  THR TYR LEU LYS GLN ASN THR CYS ILE ILE PHE CYS LYS
+SEQRES   8 C  205  ASP ASN ILE ALA GLU VAL LYS ARG VAL ILE ASN THR GLN
+SEQRES   9 C  205  ARG VAL GLY ALA PRO ALA LYS ALA GLY VAL PHE ALA PRO
+SEQRES  10 C  205  ASN ASP VAL ILE ILE PRO ALA GLY PRO THR GLY MET GLU
+SEQRES  11 C  205  PRO THR GLN THR SER PHE LEU GLN ASP LEU LYS ILE ALA
+SEQRES  12 C  205  THR LYS ILE ASN ARG GLY GLN ILE ASP ILE VAL ASN GLU
+SEQRES  13 C  205  VAL HIS ILE ILE LYS THR GLY GLN LYS VAL GLY ALA SER
+SEQRES  14 C  205  GLU ALA THR LEU LEU GLN LYS LEU ASN ILE LYS PRO PHE
+SEQRES  15 C  205  THR TYR GLY LEU GLU PRO LYS ILE ILE TYR ASP ALA GLY
+SEQRES  16 C  205  ALA CYS TYR SER PRO SER ILE SER GLU GLU
+SEQRES   1 D  166  MET PRO PRO LYS VAL ASP PRO SER GLU LYS VAL GLU VAL
+SEQRES   2 D  166  PHE LEU ARG VAL CYS GLY GLY GLU ALA GLY ALA MET SER
+SEQRES   3 D  166  THR LEU ALA PRO LYS LEU GLY PRO LEU GLY VAL SER PRO
+SEQRES   4 D  166  LYS LYS VAL GLY ASP ASP ILE ALA LYS ALA THR GLN PRO
+SEQRES   5 D  166  TRP LYS GLY MET LYS VAL SER VAL LYS LEU THR ILE GLN
+SEQRES   6 D  166  ASN ARG ILE ALA VAL PRO GLU VAL LEU PRO SER ALA SER
+SEQRES   7 D  166  ALA LEU VAL ILE LYS ALA LEU LYS GLU PRO PRO ARG ASP
+SEQRES   8 D  166  ARG LYS LYS GLU LYS ASN ILE LYS HIS ASN GLY ASN ILE
+SEQRES   9 D  166  PRO LEU GLU GLU ILE CYS LYS ILE ALA LYS THR MET ARG
+SEQRES  10 D  166  PHE LYS SER LEU ALA VAL ASP PHE LYS GLY SER VAL LEU
+SEQRES  11 D  166  GLU ILE LEU GLY THR ALA HIS SER VAL GLY CYS LYS VAL
+SEQRES  12 D  166  ASN GLY LYS SER PRO ARG ASP ILE GLN ALA GLY ILE GLN
+SEQRES  13 D  166  SER GLY GLU ILE GLU VAL VAL GLU PRO LYS
+SEQRES   1 E  136  MET SER LYS ALA GLN ALA VAL GLY SER ASN TYR ARG VAL
+SEQRES   2 E  136  SER LEU GLY LEU PRO VAL GLY ALA VAL MET ASN SER ALA
+SEQRES   3 E  136  ASP ASN SER GLY ALA LYS ASN LEU TYR VAL ILE ALA VAL
+SEQRES   4 E  136  LYS GLY ILE LYS GLY ARG LEU ASN ARG LEU PRO SER ALA
+SEQRES   5 E  136  GLY VAL GLY ASP MET VAL MET ALA THR VAL LYS LYS GLY
+SEQRES   6 E  136  LYS PRO GLU LEU ARG LYS LYS VAL CYS THR GLY LEU VAL
+SEQRES   7 E  136  VAL ARG GLN ARG LYS HIS TRP LYS ARG LYS ASP GLY VAL
+SEQRES   8 E  136  TYR ILE TYR PHE GLU ASP ASN ALA GLY VAL MET CYS ASN
+SEQRES   9 E  136  PRO LYS GLY GLU VAL LYS GLY ASN ILE LEU GLY PRO VAL
+SEQRES  10 E  136  ALA LYS GLU CYS SER ASP LEU TRP PRO LYS VAL ALA THR
+SEQRES  11 E  136  ASN ALA GLY THR ILE VAL
+SEQRES   1 F  217  MET GLY ARG ARG PRO ALA ARG CYS TYR ARG TYR CYS LYS
+SEQRES   2 F  217  ASN LYS PRO TYR ILE LYS SER ARG TYR CYS ARG GLY VAL
+SEQRES   3 F  217  PRO ASP ALA LYS ILE ARG ILE PHE ASP LEU GLY ARG LYS
+SEQRES   4 F  217  LYS ALA SER THR ASP GLU PHE PRO LEU CYS VAL HIS LEU
+SEQRES   5 F  217  ILE SER LEU GLU LYS GLU GLN LEU SER SER GLU ALA ILE
+SEQRES   6 F  217  GLU ALA GLY ARG ILE SER CYS ASN LYS TYR ILE SER LYS
+SEQRES   7 F  217  THR GLY GLY LYS ASP SER PHE HIS MET ARG VAL ARG VAL
+SEQRES   8 F  217  HIS PRO TRP HIS VAL LEU ARG ILE ASN LYS MET LEU SER
+SEQRES   9 F  217  CYS ALA GLY ALA ASP ARG LEU GLN THR GLY MET ARG GLY
+SEQRES  10 F  217  ALA PHE GLY LYS PRO MET GLY THR VAL ALA ARG VAL ASN
+SEQRES  11 F  217  ILE GLY GLN ILE ILE PHE SER ILE ARG THR ARG ASP ASN
+SEQRES  12 F  217  MET LEU ALA ASN VAL VAL GLU ALA LEU ARG ARG SER SER
+SEQRES  13 F  217  TYR LYS PHE PRO GLY ARG GLN LYS ILE VAL VAL SER LYS
+SEQRES  14 F  217  LYS TRP GLY PHE THR ALA TYR ASN ARG GLU ALA TYR GLN
+SEQRES  15 F  217  LYS LEU LYS ALA ASP GLY ARG LEU MET ASN ASP GLY ALA
+SEQRES  16 F  217  ASN VAL LYS VAL ILE THR ASN HIS GLY THR LEU ALA GLN
+SEQRES  17 F  217  TYR ALA LYS ASP ILE ALA ALA ALA ASN
+SEQRES   1 G   69  MET LYS THR SER LEU CYS ASN TYR SER GLU PHE LYS ILE
+SEQRES   2 G   69  TYR PRO ALA ARG GLY MET LYS PHE VAL ARG GLY ASP SER
+SEQRES   3 G   69  LYS VAL PHE HIS PHE ILE ASN THR LYS VAL GLU SER LEU
+SEQRES   4 G   69  PHE PHE ARG LYS ILE ASN PRO ARG ASP ILE ARG TRP SER
+SEQRES   5 G   69  MET VAL TYR ARG ARG ILE TYR LYS ASN THR THR THR ASP
+SEQRES   6 G   69  VAL SER ALA LYS
+SEQRES   1 H   52  ILE GLU PRO SER LEU VAL ILE LEU ALA ARG LYS TYR LYS
+SEQRES   2 H   52  CYS ASP LYS MET ILE CYS ARG LYS CYS TYR ALA ARG LEU
+SEQRES   3 H   52  HIS PRO ARG ALA VAL ASN CYS ARG LYS LYS LYS CYS GLY
+SEQRES   4 H   52  HIS SER ASN ASN LEU ARG PRO LYS LYS LYS LEU LEU LYS
+SEQRES   1 I  224  MET ALA THR ARG LEU GLN TYR GLU ASN SER CYS ASP VAL
+SEQRES   2 I  224  GLY VAL PHE LEU LYS LEU THR ASN LYS TYR CYS LEU VAL
+SEQRES   3 I  224  GLY GLN CYS GLY SER LYS GLN PHE LEU HIS THR VAL GLU
+SEQRES   4 I  224  ASN ARG LEU ALA ASP HIS ILE PRO VAL VAL GLU THR SER
+SEQRES   5 I  224  ILE ALA GLY THR ARG ILE VAL GLY ARG LEU SER ALA GLY
+SEQRES   6 I  224  ASN LYS ASN GLY LEU LEU LEU PRO ASN THR CYS THR ASP
+SEQRES   7 I  224  GLN GLU LEU GLN GLN ILE ARG ASN SER LEU PRO ASP ASP
+SEQRES   8 I  224  VAL VAL VAL GLN ARG ILE GLU GLU LYS PHE SER ALA LEU
+SEQRES   9 I  224  GLY ASN CYS ILE ALA THR ASN ASP TYR VAL ALA LEU VAL
+SEQRES  10 I  224  HIS PRO ASP ILE ASP ARG GLU THR GLU GLU ILE ILE ALA
+SEQRES  11 I  224  ASP VAL LEU GLY VAL GLU VAL PHE ARG GLN THR VAL SER
+SEQRES  12 I  224  GLY ASN VAL LEU VAL GLY THR TYR CYS ALA LEU THR ASN
+SEQRES  13 I  224  GLN GLY ALA LEU VAL HIS PRO MET THR SER ILE ALA ASP
+SEQRES  14 I  224  GLN ASP GLU LEU SER SER LEU LEU GLN VAL PRO LEU VAL
+SEQRES  15 I  224  ALA GLY THR VAL ASN ARG GLY ASN GLU CYS VAL ALA ALA
+SEQRES  16 I  224  GLY CYS VAL VAL ASN ASP TRP THR ALA ILE VAL GLY ALA
+SEQRES  17 I  224  ASP THR THR ALA THR GLU ILE SER VAL ILE GLU SER ILE
+SEQRES  18 I  224  PHE ALA LEU
+SEQRES   1 J  250  MET SER ILE PHE THR PRO THR ASN GLN ILE ARG LEU THR
+SEQRES   2 J  250  ASN VAL ALA VAL VAL ARG MET LYS ARG ALA GLY LYS ARG
+SEQRES   3 J  250  PHE GLU ILE ALA CYS TYR LYS ASN LYS VAL VAL GLY TRP
+SEQRES   4 J  250  ARG SER GLY VAL GLU LYS ASP LEU ASP GLU VAL LEU GLN
+SEQRES   5 J  250  THR HIS SER VAL PHE VAL ASN VAL SER LYS GLY GLN VAL
+SEQRES   6 J  250  ALA LYS LYS GLU ASP LEU ILE SER ALA PHE GLY THR ASP
+SEQRES   7 J  250  ASP GLN THR GLU ILE CYS LYS GLN ILE LEU THR LYS GLY
+SEQRES   8 J  250  GLU VAL GLN VAL SER ASP LYS GLU ARG HIS THR GLN LEU
+SEQRES   9 J  250  GLU GLN MET PHE ARG ASP ILE ALA THR ILE VAL ALA ASP
+SEQRES  10 J  250  LYS CYS VAL ASN PRO GLU THR LYS ARG PRO TYR THR VAL
+SEQRES  11 J  250  ILE LEU ILE GLU ARG ALA MET LYS ASP ILE HIS TYR SER
+SEQRES  12 J  250  VAL LYS THR ASN LYS SER THR LYS GLN GLN ALA LEU GLU
+SEQRES  13 J  250  VAL ILE LYS GLN LEU LYS GLU LYS MET LYS ILE GLU ARG
+SEQRES  14 J  250  ALA HIS MET ARG LEU ARG PHE ILE LEU PRO VAL ASN GLU
+SEQRES  15 J  250  GLY LYS LYS LEU LYS GLU LYS LEU LYS PRO LEU ILE LYS
+SEQRES  16 J  250  VAL ILE GLU SER GLU ASP TYR GLY GLN GLN LEU GLU ILE
+SEQRES  17 J  250  VAL CYS LEU ILE ASP PRO GLY CYS PHE ARG GLU ILE ASP
+SEQRES  18 J  250  GLU LEU ILE LYS LYS GLU THR LYS GLY LYS GLY SER LEU
+SEQRES  19 J  250  GLU VAL LEU ASN LEU LYS ASP VAL GLU GLU GLY ASP GLU
+SEQRES  20 J  250  LYS PHE GLU
+SEQRES   1 N 3741  U   C   C   G   C   C   U   C   A   C   C   U   U
+SEQRES   2 N 3741  U   G   U   A   A   G   A   U   U   A   C   C   C
+SEQRES   3 N 3741  G   C   U   G   A   A   C   U   U   A   A   G   C
+SEQRES   4 N 3741  A   U   A   U   C   A   G   U   A   A   G   C   G
+SEQRES   5 N 3741  G   A   G   G   A   A   A   A   G   A   A   A   C
+SEQRES   6 N 3741  U   A   A   C   U   A   G   G   A   U   U   C   C
+SEQRES   7 N 3741  G   U   C   A   G   U   A   A   C   G   G   C   G
+SEQRES   8 N 3741  A   G   U   G   A   A   G   A   C   G   G   A   A
+SEQRES   9 N 3741  U   A   G   C   C   C   A   A   G   G   U   U   C
+SEQRES  10 N 3741  A   A   A   C   C   U   G   G   A   U   C   U   C
+SEQRES  11 N 3741  U   U   C   G   A   G   G   U   U   A   G   G   U
+SEQRES  12 N 3741  G   A   U   G   U   G   A   C   C   U   A   U   G
+SEQRES  13 N 3741  G   A   C   U   G   A   U   G   G   A   G   C   C
+SEQRES  14 N 3741  C   G   C   U   G   U   U   G   U   G   A   C   U
+SEQRES  15 N 3741  G   C   U   A   A   U   U   C   C   G   U   U   U
+SEQRES  16 N 3741  G   G   A   A   U   U   U   C   G   A   G   U   C
+SEQRES  17 N 3741  G   U   A   G   A   A   G   G   U   G   A   U   A
+SEQRES  18 N 3741  A   C   C   C   U   G   U   U   C   G   C   A   G
+SEQRES  19 N 3741  U   A   U   C   A   C   A   A   C   A   G   U   U
+SEQRES  20 N 3741  G   G   A   C   U   U   U   G   C   C   A   U   U
+SEQRES  21 N 3741  A   G   C   U   C   C   A   C   G   A   G   U   A
+SEQRES  22 N 3741  G   G   A   A   U   G   U   C   U   G   A   A   A
+SEQRES  23 N 3741  U   U   G   C   A   U   U   C   U   G   A   A   U
+SEQRES  24 N 3741  G   G   G   U   G   A   U   A   A   G   A   U   U
+SEQRES  25 N 3741  C   A   U   C   C   A   A   G   G   C   U   A   A
+SEQRES  26 N 3741  A   U   A   U   A   U   G   U   U   A   G   G   A
+SEQRES  27 N 3741  G   A   U   C   G   A   U   A   G   C   A   U   A
+SEQRES  28 N 3741  C   A   A   G   U   A   C   C   G   U   G   A   G
+SEQRES  29 N 3741  G   G   A   A   A   G   G   U   G   A   A   A   A
+SEQRES  30 N 3741  G   A   A   C   U   U   U   G   A   A   A   A   A
+SEQRES  31 N 3741  A   G   G   U   U   U   A   A   A   A   G   U   A
+SEQRES  32 N 3741  U   U   U   G   A   C   A   C   C   G   U   U   U
+SEQRES  33 N 3741  A   U   G   U   G   G   A   A   G   C   G   U   U
+SEQRES  34 N 3741  U   A   C   U   U   G   G   A   C   C   C   C   G
+SEQRES  35 N 3741  A   U   U   A   A   U   G   A   C   G   U   C   G
+SEQRES  36 N 3741  G   U   U   U   A   G   C   U   C   U   A   A   U
+SEQRES  37 N 3741  U   C   U   U   A   G   G   U   G   G   C   C   A
+SEQRES  38 N 3741  A   A   G   U   A   G   A   G   U   G   U   U   A
+SEQRES  39 N 3741  C   G   U   G   C   U   G   A   U   C   A   A   A
+SEQRES  40 N 3741  A   G   G   U   A   A   C   G   G   A   C   A   U
+SEQRES  41 N 3741  U   U   G   A   U   U   C   A   U   U   G   G   U
+SEQRES  42 N 3741  U   A   U   C   G   A   C   G   A   G   G   A   A
+SEQRES  43 N 3741  G   G   U   A   C   U   C   U   A   A   A   U   C
+SEQRES  44 N 3741  G   G   C   C   A   G   U   U   A   C   U   A   A
+SEQRES  45 N 3741  C   G   G   G   U   G   A   G   A   U   C   U   G
+SEQRES  46 N 3741  A   U   G   U   U   U   A   U   A   A   A   A   U
+SEQRES  47 N 3741  G   G   G   G   G   A   U   G   A   G   G   C   U
+SEQRES  48 N 3741  U   A   U   C   G   G   C   U   U   G   C   U   G
+SEQRES  49 N 3741  G   U   G   G   C   U   C   G   C   U   C   U   C
+SEQRES  50 N 3741  A   A   U   A   A   U   G   G   A   U   A   U   U
+SEQRES  51 N 3741  G   G   G   U   U   U   C   A   U   C   A   A   G
+SEQRES  52 N 3741  A   G   U   G   C   A   A   A   A   U   G   G   U
+SEQRES  53 N 3741  G   G   C   A   A   U   U   C   A   C   U   A   U
+SEQRES  54 N 3741  U   A   G   U   G   G   U   U   A   U   U   A   A
+SEQRES  55 N 3741  U   U   U   U   G   U   U   U   G   C   G   U   G
+SEQRES  56 N 3741  G   C   U   U   G   G   C   C   U   U   G   U   C
+SEQRES  57 N 3741  U   A   C   A   G   G   U   U   A   U   C   U   U
+SEQRES  58 N 3741  C   G   G   A   U   G   G   C   U   U   G   U   A
+SEQRES  59 N 3741  G   C   U   U   U   G   U   U   G   A   A   C   G
+SEQRES  60 N 3741  C   G   U   G   G   G   C   U   U   A   A   U   G
+SEQRES  61 N 3741  U   U   G   U   G   A   U   U   C   U   A   G   U
+SEQRES  62 N 3741  A   G   C   G   U   U   A   C   C   A   U   A   U
+SEQRES  63 N 3741  C   G   U   U   A   G   A   G   U   G   G   G   U
+SEQRES  64 N 3741  U   C   A   A   U   A   A   A   U   G   U   C   C
+SEQRES  65 N 3741  C   G   U   C   U   U   G   A   A   A   C   A   C
+SEQRES  66 N 3741  G   G   A   U   C   A   A   G   G   A   G   G   C
+SEQRES  67 N 3741  C   G   U   U   U   U   G   U   G   U   G   C   G
+SEQRES  68 N 3741  A   G   U   G   U   A   A   G   A   G   U   A   A
+SEQRES  69 N 3741  U   U   A   A   A   A   C   U   C   U   G   A   C
+SEQRES  70 N 3741  G   C   G   U   A   U   U   G   A   A   A   G   A
+SEQRES  71 N 3741  A   A   G   A   A   U   A   C   U   C   C   A   A
+SEQRES  72 N 3741  A   A   G   A   U   C   G   U   A   A   C   U   A
+SEQRES  73 N 3741  C   G   G   U   U   A   C   C   U   U   C   U   G
+SEQRES  74 N 3741  U   A   A   G   G   A   G   U   G   C   C   C   G
+SEQRES  75 N 3741  A   A   U   C   A   U   G   A   G   A   A   C   U
+SEQRES  76 N 3741  C   U   G   U   U   U   C   G   A   A   A   G   G
+SEQRES  77 N 3741  A   U   U   U   G   C   G   G   U   U   G   A   G
+SEQRES  78 N 3741  C   A   C   C   U   A   G   A   A   U   G   G   G
+SEQRES  79 N 3741  A   C   C   C   G   A   A   A   G   G   U   U   G
+SEQRES  80 N 3741  U   G   A   A   C   U   A   U   G   C   C   U   G
+SEQRES  81 N 3741  A   G   G   A   A   G   G   C   G   A   A   G   U
+SEQRES  82 N 3741  C   A   G   G   G   G   A   A   A   C   U   C   U
+SEQRES  83 N 3741  G   A   U   G   G   A   G   G   C   U   U   G   U
+SEQRES  84 N 3741  C   G   C   A   A   U   G   C   U   G   A   C   G
+SEQRES  85 N 3741  U   G   C   A   A   A   U   C   G   C   U   U   G
+SEQRES  86 N 3741  U   C   U   A   A   C   U   U   G   G   G   U   A
+SEQRES  87 N 3741  U   A   G   G   G   G   C   G   A   A   A   G   A
+SEQRES  88 N 3741  C   U   A   A   U   C   G   A   A   C   A   A   C
+SEQRES  89 N 3741  C   U   A   G   U   A   G   C   U   G   G   U   U
+SEQRES  90 N 3741  C   C   U   U   C   C   G   A   A   G   U   U   U
+SEQRES  91 N 3741  C   C   C   U   C   A   G   G   A   U   A   G   C
+SEQRES  92 N 3741  U   G   G   A   G   C   A   G   U   A   U   U   C
+SEQRES  93 N 3741  U   A   G   U   U   C   C   A   U   C   U   U   G
+SEQRES  94 N 3741  U   A   A   A   G   A   C   A   A   U   G   A   U
+SEQRES  95 N 3741  U   A   G   C   A   G   U   U   U   C   G   G   G
+SEQRES  96 N 3741  G   G   C   G   U   A   A   U   G   C   U   C   U
+SEQRES  97 N 3741  C   A   G   C   U   G   A   U   U   C   U   C   A
+SEQRES  98 N 3741  A   A   C   U   C   U   G   A   A   C   G   G   G
+SEQRES  99 N 3741  U   G   G   G   U   A   U   C   A   U   U   U   U
+SEQRES 100 N 3741  A   A   U   U   C   A   C   U   U   A   A   U   U
+SEQRES 101 N 3741  G   G   A   U   U   U   U   A   A   A   A   U   U
+SEQRES 102 N 3741  A   A   A   U   U   G   C   A   C   A   U   G   U
+SEQRES 103 N 3741  G   C   A   A   U   G   A   A   A   A   A   U   A
+SEQRES 104 N 3741  G   G   A   G   C   U   C   U   U   A   G   U   G
+SEQRES 105 N 3741  G   G   C   C   A   U   U   U   U   U   G   G   U
+SEQRES 106 N 3741  A   A   G   C   A   G   A   A   C   U   G   G   C
+SEQRES 107 N 3741  G   A   U   G   U   G   G   G   U   U   G   A   A
+SEQRES 108 N 3741  C   C   A   A   A   U   A   U   U   G   G   G   A
+SEQRES 109 N 3741  U   A   A   G   A   C   G   U   C   U   A   A   C
+SEQRES 110 N 3741  A   U   U   C   A   C   U   A   A   U   A   G   A
+SEQRES 111 N 3741  U   A   C   C   A   C   A   A   A   A   G   G   U
+SEQRES 112 N 3741  G   U   U   A   G   U   U   C   A   U   U   A   A
+SEQRES 113 N 3741  G   A   C   A   G   C   A   G   G   A   C   G   G
+SEQRES 114 N 3741  U   G   G   C   C   A   U   G   G   A   A   G   U
+SEQRES 115 N 3741  C   G   G   U   A   U   C   C   G   C   U   A   A
+SEQRES 116 N 3741  G   G   A   G   U   G   U   G   U   A   A   C   A
+SEQRES 117 N 3741  A   C   U   C   A   C   C   U   G   C   C   A   A
+SEQRES 118 N 3741  A   U   G   G   A   C   U   A   G   C   C   C   U
+SEQRES 119 N 3741  G   A   A   A   A   U   G   G   A   U   G   A   C
+SEQRES 120 N 3741  G   C   U   A   G   C   A   G   U   G   G   A   U
+SEQRES 121 N 3741  G   G   U   C   G   A   U   G   C   C   C   A   A
+SEQRES 122 N 3741  U   C   G   U   U   A   A   A   A   G   A   A   G
+SEQRES 123 N 3741  U   G   A   U   A   A   U   A   C   U   U   U   U
+SEQRES 124 N 3741  A   A   C   G   U   G   U   A   G   G   A   A   G
+SEQRES 125 N 3741  G   C   G   U   G   A   A   G   G   U   A   A   C
+SEQRES 126 N 3741  G   U   A   G   A   A   G   C   U   U   G   A   A
+SEQRES 127 N 3741  U   G   U   G   A   A   U   U   C   G   A   G   U
+SEQRES 128 N 3741  G   G   A   G   U   U   G   U   C   U   U   U   A
+SEQRES 129 N 3741  G   U   G   C   A   G   A   U   C   U   U   G   A
+SEQRES 130 N 3741  U   G   G   U   A   G   U   A   G   C   A   A   A
+SEQRES 131 N 3741  U   A   U   U   C   A   A   A   A   G   A   A   U
+SEQRES 132 N 3741  U   U   A   C   U   U   U   G   A   A   G   G   C
+SEQRES 133 N 3741  C   G   A   A   G   U   G   G   G   G   A   A   G
+SEQRES 134 N 3741  G   G   U   U   C   C   A   U   A   A   C   A   A
+SEQRES 135 N 3741  U   G   G   A   A   U   U   C   A   C   U   U   A
+SEQRES 136 N 3741  U   G   G   G   U   G   A   G   U   C   G   A   U
+SEQRES 137 N 3741  C   C   U   A   A   G   G   U   U   U   G   G   G
+SEQRES 138 N 3741  U   U   A   A   C   U   C   U   C   U   C   U   A
+SEQRES 139 N 3741  A   U   A   A   G   G   U   U   A   C   U   A   G
+SEQRES 140 N 3741  G   U   C   A   U   U   G   G   A   U   C   G   A
+SEQRES 141 N 3741  A   A   G   U   G   A   A   G   G   U   G   G   C
+SEQRES 142 N 3741  U   U   U   A   A   C   A   C   U   A   G   U   G
+SEQRES 143 N 3741  A   C   U   U   U   A   U   A   G   G   C   C   G
+SEQRES 144 N 3741  A   A   A   G   G   G   A   A   G   C   G   G   G
+SEQRES 145 N 3741  U   U   A   A   A   A   U   U   C   C   U   G   C
+SEQRES 146 N 3741  A   C   C   A   U   C   G   A   A   U   G   G   G
+SEQRES 147 N 3741  A   U   A   U   U   A   G   G   G   U   A   A   C
+SEQRES 148 N 3741  C   G   A   U   C   G   U   A   A   U   C   C   G
+SEQRES 149 N 3741  G   G   A   C   A   U   C   A   A   U   U   G   G
+SEQRES 150 N 3741  C   G   G   U   C   G   A   G   G   A   A   G   A
+SEQRES 151 N 3741  G   U   U   A   U   C   U   U   U   U   C   U   U
+SEQRES 152 N 3741  G   U   U   A   A   C   A   U   U   G   U   C   U
+SEQRES 153 N 3741  U   G   G   G   G   U   C   C   U   C   C   G   A
+SEQRES 154 N 3741  A   U   C   A   G   G   U   C   A   A   C   U   G
+SEQRES 155 N 3741  G   A   G   A   C   G   A   G   G   A   U   U   C
+SEQRES 156 N 3741  A   U   C   G   C   A   C   A   A   U   G   G   A
+SEQRES 157 N 3741  A   G   A   G   C   A   C   A   G   U   C   C   U
+SEQRES 158 N 3741  U   U   G   G   A   U   U   G   G   G   U   C   U
+SEQRES 159 N 3741  C   G   C   A   U   C   C   G   C   U   A   A   A
+SEQRES 160 N 3741  U   G   G   U   C   C   U   U   G   A   A   A   A
+SEQRES 161 N 3741  C   C   G   G   A   U   U   A   U   G   G   U   A
+SEQRES 162 N 3741  U   U   U   A   A   U   C   C   U   A   U   U   U
+SEQRES 163 N 3741  G   G   U   G   U   U   C   G   U   A   C   C   A
+SEQRES 164 N 3741  A   U   A   A   C   C   A   C   A   U   C   A   G
+SEQRES 165 N 3741  G   U   C   U   C   C   A   A   G   G   U   G   A
+SEQRES 166 N 3741  A   U   A   G   C   C   U   C   U   G   G   U   C
+SEQRES 167 N 3741  A   A   A   U   G   U   A   U   U   A   A   U   G
+SEQRES 168 N 3741  U   A   G   A   U   A   A   G   G   G   A   A   G
+SEQRES 169 N 3741  U   C   G   G   C   A   A   A   A   C   C   G   A
+SEQRES 170 N 3741  U   C   U   G   U   A   A   C   U   U   C   G   G
+SEQRES 171 N 3741  G   A   U   A   A   G   G   A   U   U   G   G   C
+SEQRES 172 N 3741  U   C   U   A   A   A   G   G   C   U   G   G   U
+SEQRES 173 N 3741  G   G   A   G   U   G   G   A   C   A   U   A   U
+SEQRES 174 N 3741  U   G   G   A   G   U   U   U   G   C   U   A   U
+SEQRES 175 N 3741  U   U   G   U   U   U   U   U   U   A   C   U   U
+SEQRES 176 N 3741  U   U   A   G   G   A   U   G   G   G   C   A   A
+SEQRES 177 N 3741  C   U   G   U   U   U   U   G   A   A   G   G   U
+SEQRES 178 N 3741  U   U   A   A   G   A   U   G   G   G   U   G   G
+SEQRES 179 N 3741  U   A   A   U   U   C   U   U   U   C   C   A   A
+SEQRES 180 N 3741  U   G   U   G   A   G   G   G   C   U   U   G   C
+SEQRES 181 N 3741  U   C   G   U   U   C   U   G   C   U   U   U   A
+SEQRES 182 N 3741  C   G   A   U   U   A   A   C   A   G   C   U   A
+SEQRES 183 N 3741  A   U   U   U   A   G   A   A   C   U   G   U   G
+SEQRES 184 N 3741  A   C   G   A   U   C   A   C   C   G   G   G   A
+SEQRES 185 N 3741  A   U   C   C   A   A   C   U   G   U   U   U   A
+SEQRES 186 N 3741  A   U   U   A   A   A   A   C   A   A   A   G   C
+SEQRES 187 N 3741  A   U   U   G   C   G   A   U   A   A   G   C   U
+SEQRES 188 N 3741  U   A   A   A   A   G   C   U   U   U   U   G   A
+SEQRES 189 N 3741  C   G   C   A   A   U   G   U   G   A   U   U   U
+SEQRES 190 N 3741  C   U   G   C   C   C   A   G   U   G   C   U   C
+SEQRES 191 N 3741  U   G   A   A   U   G   U   C   A   A   A   G   U
+SEQRES 192 N 3741  G   A   A   G   A   G   A   U   U   C   A   A   C
+SEQRES 193 N 3741  C   U   A   G   C   A   C   G   G   G   U   A   A
+SEQRES 194 N 3741  A   C   G   G   C   G   G   G   A   G   U   A   A
+SEQRES 195 N 3741  C   U   A   U   G   A   C   U   C   U   C   U   U
+SEQRES 196 N 3741  A   A   G   G   U   A   G   C   C   A   A   A   U
+SEQRES 197 N 3741  G   C   C   U   C   G   U   C   A   U   C   U   A
+SEQRES 198 N 3741  A   U   U   A   G   U   G   A   C   G   C   G   C
+SEQRES 199 N 3741  A   U   G   A   A   U   G   G   A   U   C   A   A
+SEQRES 200 N 3741  U   G   A   G   A   U   U   C   C   C   A   C   U
+SEQRES 201 N 3741  G   U   C   C   C   U   A   A   C   U   A   C   U
+SEQRES 202 N 3741  A   U   A   C   A   G   C   G   A   A   A   C   C
+SEQRES 203 N 3741  A   C   U   G   C   A   A   G   G   G   G   A   A
+SEQRES 204 N 3741  C   G   G   G   C   C   U   U   G   C   A   A   A
+SEQRES 205 N 3741  A   A   C   A   G   C   G   G   G   G   A   A   A
+SEQRES 206 N 3741  G   A   A   G   A   C   C   C   U   G   U   U   G
+SEQRES 207 N 3741  A   G   C   U   U   G   A   C   U   C   U   A   G
+SEQRES 208 N 3741  U   C   U   G   A   U   A   U   U   G   C   A   U
+SEQRES 209 N 3741  A   G   U   G   A   C   C   U   A   A   A   A   G
+SEQRES 210 N 3741  G   U   G   U   A   G   A   A   U   A   G   G   U
+SEQRES 211 N 3741  G   G   G   A   G   G   G   G   C   A   A   C   C
+SEQRES 212 N 3741  C   G   A   C   G   G   U   G   A   A   A   U   A
+SEQRES 213 N 3741  C   C   A   C   C   C   C   U   U   U   U   G   G
+SEQRES 214 N 3741  C   G   U   U   A   C   U   U   U   G   C   U   A
+SEQRES 215 N 3741  A   C   U   U   G   G   A   A   U   A   A   C   A
+SEQRES 216 N 3741  G   U   A   C   C   U   C   A   U   A   A   U   U
+SEQRES 217 N 3741  C   A   U   U   U   U   A   U   G   A   U   G   G
+SEQRES 218 N 3741  U   U   U   U   G   G   U   G   A   A   U   A   A
+SEQRES 219 N 3741  G   C   G   G   A   U   C   A   A   C   C   A   C
+SEQRES 220 N 3741  G   G   G   U   G   A   A   A   U   C   U   G   U
+SEQRES 221 N 3741  G   C   A   A   A   U   U   G   G   G   C   A   A
+SEQRES 222 N 3741  C   U   G   A   U   U   U   G   U   A   U   A   G
+SEQRES 223 N 3741  C   A   A   A   G   U   A   G   U   C   C   C   U
+SEQRES 224 N 3741  C   U   G   G   U   C   C   C   G   U   A   U   U
+SEQRES 225 N 3741  A   U   G   U   C   G   A   C   C   A   A   G   A
+SEQRES 226 N 3741  A   C   A   G   U   U   U   C   A   G   G   U   G
+SEQRES 227 N 3741  G   G   G   A   G   U   U   U   G   G   C   U   G
+SEQRES 228 N 3741  G   G   G   C   G   G   C   A   C   A   U   U   U
+SEQRES 229 N 3741  G   U   U   A   A   A   A   G   A   U   A   A   C
+SEQRES 230 N 3741  G   C   A   A   G   U   G   U   C   C   A   A   A
+SEQRES 231 N 3741  G   G   C   A   G   G   C   U   C   A   G   U   G
+SEQRES 232 N 3741  A   G   A   A   C   A   G   A   A   A   U   C   U
+SEQRES 233 N 3741  C   A   C   G   U   A   G   A   G   U   A   A   A
+SEQRES 234 N 3741  A   G   G   G   C   A   A   A   A   G   C   C   U
+SEQRES 235 N 3741  G   C   U   U   G   A   U   U   C   U   G   A   U
+SEQRES 236 N 3741  U   U   U   C   A   G   U   A   C   U   A   A   U
+SEQRES 237 N 3741  C   G   G   A   A   C   U   G   G   G   A   A   A
+SEQRES 238 N 3741  C   C   A   G   G   G   C   C   U   A   U   C   G
+SEQRES 239 N 3741  A   U   C   C   U   U   U   A   U   G   U   G   C
+SEQRES 240 N 3741  U   U   A   A   A   U   C   U   U   A   A   C   C
+SEQRES 241 N 3741  C   U   A   G   A   G   G   U   G   U   C   A   G
+SEQRES 242 N 3741  A   A   A   A   G   U   U   A   C   C   A   C   A
+SEQRES 243 N 3741  G   G   G   A   U   A   A   C   U   G   G   C   U
+SEQRES 244 N 3741  U   G   U   G   G   C   A   G   C   C   A   A   G
+SEQRES 245 N 3741  C   G   C   U   C   A   U   A   G   C   G   A   C
+SEQRES 246 N 3741  G   C   U   G   C   U   U   U   U   U   G   A   U
+SEQRES 247 N 3741  C   C   U   U   C   G   A   U   G   U   C   G   G
+SEQRES 248 N 3741  C   U   C   U   U   C   U   U   A   U   C   A   U
+SEQRES 249 N 3741  U   G   U   G   A   A   G   C   A   G   A   A   U
+SEQRES 250 N 3741  U   C   A   C   A   A   A   G   U   G   U   U   G
+SEQRES 251 N 3741  G   A   U   U   G   U   U   C   A   C   C   C   A
+SEQRES 252 N 3741  C   U   A   A   C   A   A   G   G   A   A   C   G
+SEQRES 253 N 3741  U   G   A   G   C   U   G   G   G   U   U   U   A
+SEQRES 254 N 3741  G   A   C   C   G   U   C   G   U   G   A   G   A
+SEQRES 255 N 3741  C   A   G   G   U   U   A   G   U   U   U   U   A
+SEQRES 256 N 3741  C   C   C   U   A   C   U   G   U   U   G   U   C
+SEQRES 257 N 3741  A   A   U   U   G   U   U   U   G   C   G   U   A
+SEQRES 258 N 3741  A   U   A   G   U   A   G   C   A   U   G   A   U
+SEQRES 259 N 3741  U   U   A   G   U   A   C   G   A   G   A   G   G
+SEQRES 260 N 3741  A   A   C   U   G   U   C   A   U   G   C   C   G
+SEQRES 261 N 3741  G   A   U   C   A   C   U   G   G   U   C   U   G
+SEQRES 262 N 3741  U   A   G   G   U   U   U   A   U   U   U   G   A
+SEQRES 263 N 3741  C   A   A   A   A   U   A   G   U   G   A   C   C
+SEQRES 264 N 3741  U   G   C   C   G   C   U   A   C   C   A   U   C
+SEQRES 265 N 3741  C   G   U   U   G   G   A   U   A   A   U   G   G
+SEQRES 266 N 3741  C   U   G   A   A   C   G   C   C   U   C   U   A
+SEQRES 267 N 3741  A   G   U   C   A   G   A   A   U   C   C   A   U
+SEQRES 268 N 3741  U   C   U   A   G   A   A   A   C   G   C   A   A
+SEQRES 269 N 3741  A   C   C   A   A   A   U   G   C   U   U   U   A
+SEQRES 270 N 3741  G   A   G   U   G   U   G   A   A   U   G   U   U
+SEQRES 271 N 3741  G   U   A   G   G   U   A   A   C   A   U   U   A
+SEQRES 272 N 3741  G   G   U   U   G   U   U   G   G   U   G   G   G
+SEQRES 273 N 3741  G   G   A   C   C   A   C   U   U   U   C   A   A
+SEQRES 274 N 3741  C   U   U   U   A   A   A   C   C   A   U   A   U
+SEQRES 275 N 3741  G   A   U   U   A   A   U   C   G   C   U   G   U
+SEQRES 276 N 3741  U   A   C   A   C   U   G   C   A   G   U   U   U
+SEQRES 277 N 3741  C   C   U   U   C   C   G   G   U   U   A   U   U
+SEQRES 278 N 3741  G   U   G   G   U   G   G   G   U   G   G   C   U
+SEQRES 279 N 3741  A   A   A   U   U   C   U   A   A   U   U   U   A
+SEQRES 280 N 3741  U   A   U   C   C   U   C   G   U   U   C   C   G
+SEQRES 281 N 3741  C   U   C   A   A   C   U   C   U   U   C   G   A
+SEQRES 282 N 3741  U   U   G   U   A   G   A   C   G   A   C   U   A
+SEQRES 283 N 3741  U   C   A   A   A   U   G   A   A   C   U   A   G
+SEQRES 284 N 3741  G   U   G   C   U   G   U   A   A   G   C   U   U
+SEQRES 285 N 3741  C   C   G   A   G   U   A   G   C   G   U   U   C
+SEQRES 286 N 3741  A   G   U   U   A   C   G   A   G   G   G   G   U
+SEQRES 287 N 3741  U   G   A   G   G   C   U   U   U   U   C   C   A
+SEQRES 288 N 3741  U   U   A   G   U   U   C   U   U   U
+HELIX    1   1 ASN A   13  ARG A   17  1                                   5
+HELIX    2   2 SER A  111  ARG A  116  1                                   6
+HELIX    3   3 GLU A  141  ARG A  157  1                                  17
+HELIX    4   4 SER A  190  ASN A  201  1                                  12
+HELIX    5   5 ASN A  207  PHE A  212  1                                   6
+HELIX    6   6 GLY A  231  GLY A  237  1                                   7
+HELIX    7   7 HIS A  378  GLY A  389  1                                  12
+HELIX    8   8 ASN B   61  LYS B   84  1                                  24
+HELIX    9   9 SER B  148  SER B  163  1                                  16
+HELIX   10  10 ARG C    8  LEU C   19  1                                  12
+HELIX   11  11 GLN C   38  ILE C   42  1                                   5
+HELIX   12  12 LYS C   44  ILE C   49  1                                   6
+HELIX   13  13 ILE C   64  ALA C   68  1                                   5
+HELIX   14  14 ARG C   99  GLN C  104  1                                   6
+HELIX   15  15 ALA C  124  MET C  129  1                                   6
+HELIX   16  16 GLN C  133  LEU C  140  1                                   8
+HELIX   17  17 GLY C  167  LEU C  177  1                                  11
+HELIX   18  18 LYS D   31  GLY D   36  1                                   6
+HELIX   19  19 PRO D   39  GLN D   51  1                                  13
+HELIX   20  20 ALA D   77  LYS D   86  1                                  10
+HELIX   21  21 LEU D  106  THR D  115  1                                  10
+HELIX   22  22 SER D  128  GLY D  134  1                                   7
+HELIX   23  23 ALA E  118  LEU E  124  1                                   7
+HELIX   24  24 TRP E  125  ALA E  132  1                                   8
+HELIX   25  25 PRO F    5  ARG F   10  1                                   6
+HELIX   26  26 SER F   62  LYS F   74  1                                  13
+HELIX   27  27 ALA F  146  PHE F  159  1                                  14
+HELIX   28  28 ARG F  178  GLY F  188  1                                  11
+HELIX   29  29 ASN G   33  LYS G   43  1                                  11
+HELIX   30  30 SER G   52  TYR G   59  1                                   8
+HELIX   31  31 ILE H    1  CYS H   14  1                                  14
+HELIX   32  32 SER I   31  ARG I   41  1                                  11
+HELIX   33  33 THR I   77  LEU I   88  1                                  12
+HELIX   34  34 ASP I  122  GLY I  134  1                                  13
+HELIX   35  35 SER I  166  GLN I  178  1                                  13
+HELIX   36  36 CYS I  192  GLY I  196  1                                   5
+HELIX   37  37 THR I  211  ALA I  223  1                                  13
+HELIX   38  38 ASN J   34  GLY J   42  1                                   9
+HELIX   39  39 LYS J   45  LEU J   51  1                                   7
+HELIX   40  40 LYS J   67  GLY J   76  1                                  10
+HELIX   41  41 ASP J   79  GLY J   91  1                                  13
+HELIX   42  42 SER J   96  ALA J  116  1                                  21
+HELIX   43  43 THR J  129  HIS J  141  1                                  13
+HELIX   44  44 SER J  149  MET J  165  1                                  17
+HELIX   45  45 GLU J  182  ILE J  194  1                                  13
+HELIX   46  46 PHE J  217  GLY J  230  1                                  14
+SHEET    1   1 1 ALA A  45  ASP A  59  0
+SHEET    2   2 1 GLU A  71  GLU A  80  0
+SHEET    3   3 1 MET A  84  TYR A  92  0
+SHEET    4   4 1 THR A 101  TRP A 106  0
+SHEET    5   5 1 ARG A 162  HIS A 166  0
+SHEET    6   6 1 VAL A 181  GLN A 185  0
+SHEET    7   7 1 THR A 205  VAL A 206  0
+SHEET    8   8 1 ILE A 218  VAL A 223  0
+SHEET    9   9 1 GLY A 228  PHE A 229  0
+SHEET   10  10 1 GLN A 272  LEU A 273  0
+SHEET   11  11 1 HIS A 277  LYS A 283  0
+SHEET   12  12 1 PHE A 329  LYS A 333  0
+SHEET   13  13 1 ALA A 343  LYS A 348  0
+SHEET   14  14 1 LEU A 364  ILE A 367  0
+SHEET   15  15 1 ARG B   8  GLN B  11  0
+SHEET   16  16 1 THR B  17  VAL B  20  0
+SHEET   17  17 1 VAL B  25  THR B  28  0
+SHEET   18  18 1 THR B  33  SER B  35  0
+SHEET   19  19 1 ILE B  45  LEU B  47  0
+SHEET   20  20 1 GLU B  52  VAL B  55  0
+SHEET   21  21 1 TYR B  86  VAL B  93  0
+SHEET   22  22 1 VAL B 101  THR B 104  0
+SHEET   23  23 1 VAL B 109  ILE B 112  0
+SHEET   24  24 1 ARG B 122  GLU B 125  0
+SHEET   25  25 1 THR B 131  TYR B 133  0
+SHEET   26  26 1 GLU B 141  GLY B 146  0
+SHEET   27  27 1 GLY B 176  GLU B 181  0
+SHEET   28  28 1 LYS C  25  GLU C  30  0
+SHEET   29  29 1 GLY C  50  VAL C  52  0
+SHEET   30  30 1 THR C  85  CYS C  90  0
+SHEET   31  31 1 VAL C 106  GLY C 107  0
+SHEET   32  32 1 LYS C 145  ILE C 146  0
+SHEET   33  33 1 ILE C 151  ASP C 152  0
+SHEET   34  34 1 THR C 183  TYR C 184  0
+SHEET   35  35 1 GLU C 187  TYR C 192  0
+SHEET   36  36 1 LEU D  15  ARG D  16  0
+SHEET   37  37 1 LYS D  61  LEU D  62  0
+SHEET   38  38 1 LEU E  17  PRO E  18  0
+SHEET   39  39 1 VAL E  22  ASN E  24  0
+SHEET   40  40 1 ASN E  33  VAL E  39  0
+SHEET   41  41 1 SER E  51  ALA E  52  0
+SHEET   42  42 1 MET E  57  THR E  61  0
+SHEET   43  43 1 CYS E  74  ARG E  80  0
+SHEET   44  44 1 TRP E  85  LYS E  86  0
+SHEET   45  45 1 TYR E  92  PHE E  95  0
+SHEET   46  46 1 ALA E  99  MET E 102  0
+SHEET   47  47 1 LEU F  48  SER F  54  0
+SHEET   48  48 1 GLN F  59  SER F  61  0
+SHEET   49  49 1 HIS F  95  ILE F  99  0
+SHEET   50  50 1 LYS F 121  ARG F 128  0
+SHEET   51  51 1 GLN F 133  THR F 140  0
+SHEET   52  52 1 GLN F 163  VAL F 167  0
+SHEET   53  53 1 SER G   4  LEU G   5  0
+SHEET   54  54 1 LYS G  12  ILE G  13  0
+SHEET   55  55 1 LYS G  20  VAL G  22  0
+SHEET   56  56 1 VAL G  28  PHE G  29  0
+SHEET   57  57 1 ALA I   2  ARG I   4  0
+SHEET   58  58 1 LEU I  17  LEU I  19  0
+SHEET   59  59 1 CYS I  24  VAL I  26  0
+SHEET   60  60 1 ALA I  64  GLY I  65  0
+SHEET   61  61 1 GLY I  69  LEU I  72  0
+SHEET   62  62 1 VAL I  93  ARG I  96  0
+SHEET   63  63 1 ALA I 109  THR I 110  0
+SHEET   64  64 1 VAL I 114  LEU I 116  0
+SHEET   65  65 1 GLU I 136  VAL I 137  0
+SHEET   66  66 1 CYS I 152  LEU I 154  0
+SHEET   67  67 1 ALA I 159  VAL I 161  0
+SHEET   68  68 1 CYS I 197  VAL I 199  0
+SHEET   69  69 1 ALA I 204  VAL I 206  0
+SHEET   70  70 1 ALA J  16  LYS J  21  0
+SHEET   71  71 1 ARG J  26  CYS J  31  0
+SHEET   72  72 1 PHE J  57  ASN J  59  0
+SHEET   73  73 1 GLN J  64  VAL J  65  0
+SHEET   74  74 1 GLU J  92  GLN J  94  0
+SHEET   75  75 1 ALA J 170  LEU J 178  0
+SHEET   76  76 1 LYS J 195  GLU J 200  0
+SHEET   77  77 1 GLU J 207  PRO J 214  0
+SHEET   78  78 1 LEU J 234  GLY J 245  0
+CRYST1    1.000    1.000    1.000  90.00  90.00  90.00 P 1           1
+ATOM      1  P   G   N1441     177.164 199.518 137.030  1.00 30.38           P
+ATOM      2  OP1 G   N1441     176.091 199.072 136.104  1.00 30.49           O
+ATOM      3  OP2 G   N1441     178.546 198.995 136.859  1.00 29.70           O
+ATOM      4  O5' G   N1441     177.211 201.107 137.026  1.00 30.11           O
+ATOM      5  C5' G   N1441     178.085 201.797 136.136  1.00 30.05           C
+ATOM      6  C4' G   N1441     177.872 203.281 136.252  1.00 29.74           C
+ATOM      7  O4' G   N1441     178.156 203.727 137.607  1.00 28.74           O
+ATOM      8  C3' G   N1441     178.783 204.098 135.352  1.00 29.86           C
+ATOM      9  O3' G   N1441     178.162 204.212 134.081  1.00 30.41           O
+ATOM     10  C2' G   N1441     178.974 205.374 136.159  1.00 29.37           C
+ATOM     11  O2' G   N1441     177.909 206.300 136.059  1.00 30.22           O
+ATOM     12  C1' G   N1441     179.085 204.796 137.568  1.00 28.11           C
+ATOM     13  N9  G   N1441     180.404 204.230 137.832  1.00 26.39           N
+ATOM     14  C8  G   N1441     180.685 202.914 138.116  1.00 25.72           C
+ATOM     15  N7  G   N1441     181.957 202.690 138.294  1.00 24.66           N
+ATOM     16  C5  G   N1441     182.554 203.927 138.103  1.00 24.17           C
+ATOM     17  C6  G   N1441     183.915 204.302 138.160  1.00 23.76           C
+ATOM     18  O6  G   N1441     184.899 203.595 138.403  1.00 23.94           O
+ATOM     19  N1  G   N1441     184.083 205.656 137.900  1.00 23.41           N
+ATOM     20  C2  G   N1441     183.074 206.541 137.621  1.00 23.76           C
+ATOM     21  N2  G   N1441     183.448 207.815 137.399  1.00 23.86           N
+ATOM     22  N3  G   N1441     181.794 206.205 137.572  1.00 24.56           N
+ATOM     23  C4  G   N1441     181.609 204.888 137.813  1.00 24.87           C
+ATOM     24  P   G   N1442     178.981 203.826 132.773  1.00 31.10           P
+ATOM     25  OP1 G   N1442     178.054 203.919 131.616  1.00 32.24           O
+ATOM     26  OP2 G   N1442     179.719 202.559 133.030  1.00 30.51           O
+ATOM     27  O5' G   N1442     180.010 205.032 132.668  1.00 30.39           O
+ATOM     28  C5' G   N1442     179.514 206.376 132.696  1.00 30.03           C
+ATOM     29  C4' G   N1442     180.645 207.350 132.544  1.00 29.97           C
+ATOM     30  O4' G   N1442     181.406 207.374 133.774  1.00 28.89           O
+ATOM     31  C3' G   N1442     181.677 207.028 131.474  1.00 30.84           C
+ATOM     32  O3' G   N1442     181.256 207.451 130.180  1.00 32.95           O
+ATOM     33  C2' G   N1442     182.889 207.808 131.963  1.00 30.16           C
+ATOM     34  O2' G   N1442     182.892 209.174 131.602  1.00 31.20           O
+ATOM     35  C1' G   N1442     182.756 207.665 133.480  1.00 28.57           C
+ATOM     36  N9  G   N1442     183.594 206.604 134.018  1.00 26.99           N
+ATOM     37  C8  G   N1442     183.267 205.288 134.242  1.00 26.62           C
+ATOM     38  N7  G   N1442     184.258 204.591 134.729  1.00 26.08           N
+ATOM     39  C5  G   N1442     185.304 205.499 134.818  1.00 25.29           C
+ATOM     40  C6  G   N1442     186.638 205.329 135.267  1.00 24.39           C
+ATOM     41  O6  G   N1442     187.171 204.320 135.748  1.00 24.29           O
+ATOM     42  N1  G   N1442     187.372 206.498 135.129  1.00 23.94           N
+ATOM     43  C2  G   N1442     186.869 207.704 134.725  1.00 24.51           C
+ATOM     44  N2  G   N1442     187.709 208.742 134.773  1.00 24.54           N
+ATOM     45  N3  G   N1442     185.631 207.881 134.304  1.00 25.45           N
+ATOM     46  C4  G   N1442     184.909 206.744 134.375  1.00 26.02           C
+ATOM     47  P   U   N1443     180.446 206.452 129.226  1.00 35.37           P
+ATOM     48  OP1 U   N1443     178.996 206.743 129.377  1.00 35.86           O
+ATOM     49  OP2 U   N1443     180.945 205.070 129.454  1.00 35.52           O
+ATOM     50  O5' U   N1443     180.882 206.920 127.767  1.00 38.01           O
+ATOM     51  C5' U   N1443     182.127 206.491 127.184  1.00 40.61           C
+ATOM     52  C4' U   N1443     182.808 207.634 126.467  1.00 42.75           C
+ATOM     53  O4' U   N1443     182.231 207.811 125.144  1.00 45.14           O
+ATOM     54  C3' U   N1443     182.760 209.000 127.155  1.00 43.35           C
+ATOM     55  O3' U   N1443     184.062 209.556 127.283  1.00 42.66           O
+ATOM     56  C2' U   N1443     181.838 209.828 126.263  1.00 44.99           C
+ATOM     57  O2' U   N1443     182.153 211.206 126.243  1.00 45.41           O
+ATOM     58  C1' U   N1443     182.064 209.189 124.893  1.00 46.57           C
+ATOM     59  N1  U   N1443     180.961 209.377 123.935  1.00 49.85           N
+ATOM     60  C2  U   N1443     179.735 208.791 124.207  1.00 52.28           C
+ATOM     61  O2  U   N1443     179.526 208.113 125.199  1.00 52.06           O
+ATOM     62  N3  U   N1443     178.763 209.024 123.265  1.00 54.39           N
+ATOM     63  C4  U   N1443     178.879 209.771 122.111  1.00 54.62           C
+ATOM     64  O4  U   N1443     177.906 209.889 121.364  1.00 55.01           O
+ATOM     65  C5  U   N1443     180.174 210.346 121.903  1.00 53.70           C
+ATOM     66  C6  U   N1443     181.145 210.138 122.801  1.00 51.82           C
+ATOM     67  P   G   N1444     184.895 209.299 128.617  1.00 41.58           P
+ATOM     68  OP1 G   N1444     184.962 207.832 128.841  1.00 41.46           O
+ATOM     69  OP2 G   N1444     184.338 210.179 129.676  1.00 41.55           O
+ATOM     70  O5' G   N1444     186.359 209.793 128.233  1.00 39.58           O
+ATOM     71  C5' G   N1444     186.721 211.188 128.286  1.00 38.00           C
+ATOM     72  C4' G   N1444     188.065 211.363 128.952  1.00 36.21           C
+ATOM     73  O4' G   N1444     187.984 211.019 130.363  1.00 34.46           O
+ATOM     74  C3' G   N1444     189.175 210.478 128.422  1.00 35.78           C
+ATOM     75  O3' G   N1444     189.681 210.992 127.197  1.00 36.99           O
+ATOM     76  C2' G   N1444     190.153 210.490 129.586  1.00 35.02           C
+ATOM     77  O2' G   N1444     190.958 211.648 129.676  1.00 36.88           O
+ATOM     78  C1' G   N1444     189.194 210.400 130.772  1.00 33.20           C
+ATOM     79  N9  G   N1444     188.902 209.020 131.143  1.00 31.06           N
+ATOM     80  C8  G   N1444     187.678 208.398 131.103  1.00 30.41           C
+ATOM     81  N7  G   N1444     187.724 207.151 131.486  1.00 29.69           N
+ATOM     82  C5  G   N1444     189.060 206.933 131.789  1.00 28.92           C
+ATOM     83  C6  G   N1444     189.716 205.765 132.250  1.00 27.87           C
+ATOM     84  O6  G   N1444     189.230 204.655 132.494  1.00 27.57           O
+ATOM     85  N1  G   N1444     191.075 205.986 132.448  1.00 26.33           N
+ATOM     86  C2  G   N1444     191.727 207.166 132.201  1.00 26.62           C
+ATOM     87  N2  G   N1444     193.048 207.172 132.438  1.00 26.05           N
+ATOM     88  N3  G   N1444     191.127 208.265 131.770  1.00 28.33           N
+ATOM     89  C4  G   N1444     189.802 208.076 131.584  1.00 29.68           C
+ATOM     90  P   U   N1445     189.489 210.170 125.828  1.00 39.08           P
+ATOM     91  OP1 U   N1445     189.388 211.155 124.715  1.00 39.92           O
+ATOM     92  OP2 U   N1445     188.398 209.176 126.014  1.00 39.14           O
+ATOM     93  O5' U   N1445     190.873 209.395 125.689  1.00 36.25           O
+ATOM     94  C5' U   N1445     192.114 210.114 125.758  1.00 34.72           C
+ATOM     95  C4' U   N1445     193.093 209.399 126.656  1.00 34.22           C
+ATOM     96  O4' U   N1445     192.486 209.089 127.939  1.00 33.11           O
+ATOM     97  C3' U   N1445     193.595 208.053 126.166  1.00 33.32           C
+ATOM     98  O3' U   N1445     194.576 208.197 125.147  1.00 33.65           O
+ATOM     99  C2' U   N1445     194.121 207.446 127.457  1.00 32.34           C
+ATOM    100  O2' U   N1445     195.370 207.964 127.866  1.00 32.29           O
+ATOM    101  C1' U   N1445     193.038 207.881 128.446  1.00 32.09           C
+ATOM    102  N1  U   N1445     191.957 206.894 128.613  1.00 31.29           N
+ATOM    103  C2  U   N1445     192.289 205.684 129.193  1.00 30.31           C
+ATOM    104  O2  U   N1445     193.424 205.405 129.533  1.00 30.02           O
+ATOM    105  N3  U   N1445     191.251 204.793 129.309  1.00 29.95           N
+ATOM    106  C4  U   N1445     189.934 204.996 128.957  1.00 30.46           C
+ATOM    107  O4  U   N1445     189.114 204.091 129.130  1.00 30.98           O
+ATOM    108  C5  U   N1445     189.666 206.274 128.373  1.00 30.88           C
+ATOM    109  C6  U   N1445     190.661 207.159 128.225  1.00 31.18           C
+TER     110      C   N3480
+END
