@@ -1,0 +1,52 @@
+---
+config:
+  theme: base
+  themeVariables:
+    primaryColor: "#5c7cfa"
+    primaryTextColor: "#fff"
+    lineColor: "#495057"
+---
+sequenceDiagram
+    participant DS as Dataset
+    participant DL as DataLoader
+    participant Aug as Augmentation
+    participant M as Model
+    participant L as Loss
+    participant O as Optimizer
+    participant E as Evaluator
+    
+    Note over DS,E: Training Loop (One Epoch)
+    
+    DL->>DS: Request batch
+    DS->>DS: Load .mrc + .pdb files
+    DS->>DL: Return (volume, features, label)
+    
+    DL->>Aug: Apply augmentation
+    Aug->>Aug: Random rotation/flip/noise
+    Aug->>DL: Augmented data
+    
+    DL->>M: Forward pass
+    M->>M: Encode volume (U-Net/CNN)
+    M->>M: Concatenate with PDB features
+    M->>M: Classify
+    M->>L: Predictions
+    
+    L->>L: Compute CrossEntropyLoss
+    L->>O: Backward pass
+    O->>O: Update weights (Adam)
+    
+    Note over DL,E: After each epoch
+    
+    DL->>E: Validation data
+    E->>M: Evaluate (no grad)
+    M->>E: Predictions
+    E->>E: Compute metrics
+    E-->>DL: Accuracy, Loss, F1-Score
+    
+    alt accuracy improved
+        E->>E: Save checkpoint
+    end
+    
+    alt early stopping triggered
+        E-->>DL: Stop training
+    end

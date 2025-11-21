@@ -1,0 +1,86 @@
+---
+config:
+  theme: base
+  themeVariables:
+    primaryColor: "#4a90e2"
+    primaryTextColor: "#fff"
+    primaryBorderColor: "#357abd"
+    lineColor: "#6c757d"
+    secondaryColor: "#82c91e"
+    tertiaryColor: "#fa5252"
+---
+graph TB
+    subgraph Input["Input Data"]
+        A[MRC File<br/>Density Map] 
+        B[PDB File<br/>Structure Coordinates]
+    end
+    
+    subgraph Preprocessing["Preprocessing"]
+        C[Load MRC<br/>Normalize<br/>Resize to 64³]
+        D[Parse PDB<br/>Extract Atoms]
+    end
+    
+    subgraph FeatureExtraction["Feature Extraction"]
+        E[P-P Distances<br/>900 features]
+        F[Torsion Angles<br/>210 features]
+        G[Base Pairing<br/>900 features]
+        H[Concatenate<br/>2010 features]
+    end
+    
+    subgraph Models["Model Architectures"]
+        I[U-Net Encoder<br/>3D Convolutions]
+        J[U-Net Decoder<br/>3D Transpose Convs]
+        K[3D CNN<br/>Baseline]
+    end
+    
+    subgraph Fusion["Feature Fusion"]
+        L[Global Pool<br/>Flatten]
+        M[Concat Volume<br/>+ PDB Features]
+    end
+    
+    subgraph Classification["Classification"]
+        N[Fully Connected<br/>Layers + Dropout]
+        O[Softmax<br/>3 Classes]
+    end
+    
+    subgraph Output["Output"]
+        P{Bulge Loop?}
+        Q{Hairpin Loop?}
+        R{Internal Loop?}
+    end
+    
+    A --> C
+    B --> D
+    
+    C --> I
+    C --> K
+    
+    D --> E
+    D --> F
+    D --> G
+    
+    E --> H
+    F --> H
+    G --> H
+    
+    I --> J
+    J --> L
+    K --> L
+    
+    L --> M
+    H --> M
+    
+    M --> N
+    N --> O
+    
+    O --> P
+    O --> Q
+    O --> R
+    
+    style Input fill:#e3f2fd
+    style Preprocessing fill:#fff3e0
+    style FeatureExtraction fill:#f3e5f5
+    style Models fill:#e8f5e9
+    style Fusion fill:#fce4ec
+    style Classification fill:#fff9c4
+    style Output fill:#c8e6c9

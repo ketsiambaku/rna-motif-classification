@@ -1,0 +1,80 @@
+---
+config:
+  theme: base
+  themeVariables:
+    primaryColor: "#20c997"
+---
+graph LR
+    subgraph UNet["U-Net Architecture"]
+        direction TB
+        
+        subgraph Encoder["Encoder Path"]
+            I[Input<br/>1×64×64×64]
+            E1[Conv3D 32<br/>BatchNorm ReLU]
+            P1[MaxPool3D /2]
+            E2[Conv3D 64<br/>BatchNorm ReLU]
+            P2[MaxPool3D /2]
+            E3[Conv3D 128<br/>BatchNorm ReLU]
+            P3[MaxPool3D /2]
+            
+            I --> E1
+            E1 --> P1
+            P1 --> E2
+            E2 --> P2
+            P2 --> E3
+            E3 --> P3
+        end
+        
+        BN[Bottleneck<br/>Conv3D 256]
+        P3 --> BN
+        
+        subgraph Decoder["Decoder Path"]
+            U3[UpConv3D 128]
+            D3[Conv3D 128<br/>+ Skip E3]
+            U2[UpConv3D 64]
+            D2[Conv3D 64<br/>+ Skip E2]
+            U1[UpConv3D 32]
+            D1[Conv3D 32<br/>+ Skip E1]
+            
+            BN --> U3
+            U3 --> D3
+            E3 -.Skip.-> D3
+            D3 --> U2
+            U2 --> D2
+            E2 -.Skip.-> D2
+            D2 --> U1
+            U1 --> D1
+            E1 -.Skip.-> D1
+        end
+        
+        GP[Global Pool<br/>32 features]
+        D1 --> GP
+    end
+    
+    subgraph Features["PDB Features"]
+        PDB[P-P Distances<br/>Torsion Angles<br/>Base Pairing<br/>2010 features]
+    end
+    
+    subgraph Classifier["Classification Head"]
+        CAT[Concatenate<br/>32 + 2010]
+        FC1[FC 256 + ReLU<br/>+ Dropout 0.5]
+        FC2[FC 128 + ReLU<br/>+ Dropout 0.3]
+        FC3[FC 3<br/>Softmax]
+        
+        CAT --> FC1
+        FC1 --> FC2
+        FC2 --> FC3
+    end
+    
+    GP --> CAT
+    PDB --> CAT
+    
+    OUT[Output<br/>Class Probabilities]
+    FC3 --> OUT
+    
+    style Encoder fill:#e3f2fd
+    style Decoder fill:#f3e5f5
+    style BN fill:#fff3e0
+    style Features fill:#e8f5e9
+    style Classifier fill:#fce4ec
+    style OUT fill:#c8e6c9
