@@ -42,25 +42,7 @@ This document breaks down the development into actionable phases with specific t
 
 ### Tasks
 
-#### 1.1 Literature Review
-**Time**: 8-10 hours
-
-**Reading List** (minimum 5-7 papers):
-- [ ] RNA secondary structure prediction methods
-- [ ] Deep learning for cryo-EM density map analysis
-- [ ] 3D U-Net applications in biomedical imaging
-- [ ] Feature extraction from PDB structures
-- [ ] RNA loop classification methods
-
-**Actions**:
-- [ ] Create `docs/related-work.md` with paper summaries
-- [ ] Document existing approaches and their limitations
-- [ ] Identify gaps that this work addresses
-- [ ] Collect BibTeX citations for final paper
-
-**Deliverable**: Literature review document with 5-7 paper summaries
-
-#### 1.2 Baseline Code Analysis
+#### 1.1 Baseline Code Analysis
 **Time**: 6-8 hours
 
 **Files to Study**:
@@ -80,7 +62,7 @@ This document breaks down the development into actionable phases with specific t
 - Baseline performance report
 - Code analysis notes in `docs/baseline-analysis.md`
 
-#### 1.3 Dataset Statistics
+#### 1.2 Dataset Statistics
 **Time**: 3-4 hours
 
 **Actions**:
@@ -104,6 +86,24 @@ Generate dataset statistics:
 
 **Deliverable**: Dataset statistics report
 
+
+#### 1.3  Literature Review
+**Time**: 8-10 hours
+
+**Reading List** (minimum 5-7 papers):
+- [ ] RNA secondary structure prediction methods
+- [ ] Deep learning for cryo-EM density map analysis
+- [ ] 3D U-Net applications in biomedical imaging
+- [ ] Feature extraction from PDB structures
+- [ ] RNA loop classification methods
+
+**Actions**:
+- [ ] Create `docs/related-work.md` with paper summaries
+- [ ] Document existing approaches and their limitations
+- [ ] Identify gaps that this work addresses
+- [ ] Collect BibTeX citations for final paper
+
+**Deliverable**: Literature review document with 5-7 paper summaries
 ### Acceptance Criteria
 - ✅ At least 5 papers read and summarized
 - ✅ Baseline code runs successfully
