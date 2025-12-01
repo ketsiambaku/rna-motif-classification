@@ -69,3 +69,17 @@ Use easy-to-understand figure and table to show the results. Combine figures to 
 6. Reference. Please use professional citation tool to insert the citation. No Wiki page or website link should be used as citation. Use published scientific papers as reference. Please see this Quick Guide on formal citations and referencesLinks to an external site..
 
 7. Double check your English, grammar, and typing!
+
+Critical Issues:
+
+The literature review is severely underdeveloped with only 3 references
+No results or progress validation are shown despite testing the preprocessing pipeline
+The evaluation strategy is not defined (no metrics, splits, or success criteria specified)
+
+For the Final Report:
+
+Expand the literature review to include 10-12+ references
+Present preliminary results including dataset statistics and baseline model performance
+Provide complete methodology details (architecture specifics, hyperparameters, training strategy)
+Add visualizations and diagrams
+Include a detailed timeline and discussion of limitations

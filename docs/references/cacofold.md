@@ -1,0 +1,23 @@
+Here’s a literature-review style section on **CaCoFold-R3D** that fits with your other RNA-motif pieces.
+
+---
+
+### CaCoFold-R3D: All-at-Once RNA Folding with 3D Motifs Framed by Evolution
+
+Most classical RNA 3D motif tools treat **secondary structure** and **motif detection** as separate steps: first predict a 2D fold (often by thermodynamics), then scan selected loops for a *small* set of motifs, one motif family at a time (e.g. RMDetect, JAR3D, RMfam, BayesPairing2). This leads to strong dependence on the quality of the pre-computed secondary structure, limited motif coverage (usually hairpins/internal loops only), and high runtime when many motifs or long RNAs are considered.
+
+CaCoFold-R3D (Karan & Rivas, 2025) proposes a unified alternative: a **probabilistic grammar** that predicts canonical helices *and* RNA 3D motifs in a **single joint model** using evolutionary information from alignments. Given a sequence or alignment, it uses R-scape to identify significantly covarying “positive” base pairs and “negative” pairs that should *not* form. These covarying helices constrain the search space for motifs: the algorithm first builds layers of nested covarying pairs (including pseudoknots via extra layers) and then folds the main layer with a specialized stochastic context-free grammar (SCFG) called **RBGJ3J4-R3D**, which simultaneously infers canonical helices and loop-embedded motifs by dynamic programming (CYK).
+
+The key idea is to abstract RNA 3D motifs into six **general motif architectures**—hairpin loops, bulges, internal loops, three-way junctions (J3), four-way junctions (J4), and branch-segment motifs in multiloops. Each architecture has an R3D SCFG describing which segments are correlated (due to non-Watson–Crick interactions) and a set of short **profile HMMs** that encode consensus sequence patterns with allowed variability (e.g. GNRA, UNCG, U-turn, Loop E, K-turn, C-loop, T-loop, docking elbow, etc.). Instead of modelling every non-canonical pair explicitly (like RMDetect’s Bayesian networks), CaCoFold-R3D groups residues into correlated segments, which makes the grammar efficient enough to integrate **up to 96 motif variants** (from 51 distinct architectures) directly into the global folding algorithm.
+
+The method has three notable design principles: **“everything, everywhere, all-at-once.”** It can handle any of the included motifs in hairpins, bulges, internal loops, J3/J4 junctions, or higher-order multiloops (via branch segments); all motifs are predicted under a single joint grammar; and the grammar folds **entire alignments** rather than single sequences, so it naturally accounts for motif sequence variability and uses helix covariation to bound where motifs can occur. A prototype with only GNRA and K-turn motifs already showed that adding covariation constraints drastically improves motif detection sensitivity and reduces false positives; the full CaCoFold-R3D extends this to a broad motif library and to pseudoknotted and tertiary base pairs via additional covariation-based layers.
+
+On Rfam v15 seed alignments, CaCoFold-R3D recovers almost all known benchmark motifs (K-turns, Loop E, C-loop, G-bulge, tetraloops, hammerhead/TTP/TPP junctions, etc.) and discovers new highly recurrent motifs, such as a conserved **group II intron J3 junction** that is strongly supported by covariation and crystallography. Runtime is practical: >95% of families run in under a minute, and even eukaryotic ribosomal RNAs are handled in tens of minutes to a few hours on a single workstation. The authors estimate an ~8% false discovery rate for covariation-supported motifs using column-shuffled control alignments, confirming that evolutionary framing is crucial to control false positives.
+
+Conceptually, CaCoFold-R3D is important for your project because it:
+
+* Treats **motifs as an integrated part of folding**, not an afterthought on top of a 2D structure.
+* Works at the **motif level** (GNRA, K-turn, Loop E, etc.), but purely from **sequence + alignment**, without 3D density.
+* Provides a large, evolutionarily grounded catalogue of motif annotations on Rfam that can serve as labels or priors for deep learning models of RNA 3D structure.
+
+In contrast, your cryo-EM U-Net aims to infer motif labels from *local 3D density + PDB-derived geometry* rather than from covariation. CaCoFold-R3D shows that motif prediction benefits from strong structural priors (SCFG architectures) and global context (alignments), suggesting that combining density-based models with grammar-style or covariation-style constraints could further stabilize motif classification, especially in ambiguous or noisy regions.

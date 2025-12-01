@@ -22,7 +22,7 @@ This document breaks down the development into actionable phases with specific t
 
 #### Deliverables
 - ✓ Git repository with proper structure
-- ✓ Dataset organized in `dataset/train/` and `dataset/test/`
+- ✓ Dataset organized in `dataset2/label/` 
 - ✓ Documentation: proposal, guidelines, roadmap
 - ✓ `.context/` directory with CCS v1.1 compliance
 
@@ -31,85 +31,496 @@ This document breaks down the development into actionable phases with specific t
 ## Phase 1: Research & Understanding
 
 ### Timeline: Week 3-4 (2 weeks)
-### Priority: HIGH
+### Status: ✅ PHASE 1 COMPLETED
 ### Prerequisites: Phase 0 completed
 
 ### Objectives
-1. Build theoretical foundation for the work
-2. Understand baseline implementation thoroughly
-3. Identify novelty and contributions of this work
-4. Prepare literature review for paper
+1. ✅ Build theoretical foundation for the work
+2. ✅ Understand baseline implementation thoroughly
+3. ✅ Identify data leakage and establish realistic baselines
+4. ✅ Generate comprehensive dataset statistics
+5. ✅ Prepare literature review for paper
 
 ### Tasks
 
-#### 1.1 Baseline Code Analysis
-**Time**: 6-8 hours
+#### 1.1 Baseline Code Analysis & Data Leakage Detection ✅
+**Status**: ✅ COMPLETED (November 28, 2025)  
+**Time**: Completed over multiple iterations
 
-**Files to Study**:
-- `example/TrainingForClassification/train.py`
-- `example/TrainingForClassification/unet_classifier.py`
-- `example/TrainingForClassification/rna_dataset.py`
-- `example/TrainingForClassification/preprocess.py`
+**Files Analyzed**:
+- ✅ `example/TrainingForClassification/train.py`
+- ✅ `example/TrainingForClassification/unet_classifier.py`
+- ✅ `example/TrainingForClassification/rna_dataset.py`
+- ✅ `example/TrainingForClassification/preprocess.py`
 
-**Actions**:
-- [ ] Run baseline code to understand workflow
-- [ ] Document current feature extraction (backbone distances)
-- [ ] Identify limitations and improvement opportunities
-- [ ] Measure baseline performance (accuracy, loss curves)
-- [ ] Document model architecture details
+**Actions Completed**:
+- ✅ Ran baseline code on dataset1 (3-class: bulge/hairpin/internal)
+- ✅ Achieved 100% accuracy → suspected data leakage
+- ✅ Extended analysis to dataset2 (14-class: fine-grained size classification)
+- ✅ Achieved 100% validation accuracy → confirmed severe leakage
+- ✅ **Discovered root cause**: PDB phosphate distance matrix sparsity encodes motif size
+  - Small motifs (bulge1): 97.78% sparse
+  - Large motifs (5x5): 66% sparse
+  - Sparsity range: 31.78% (enables trivial size classification)
+- ✅ Trained PDB-only classifier: 98.8% accuracy (proof of leakage)
+- ✅ Trained density-only model (14-class): 21.99% accuracy (76.8pp drop proves leakage)
+- ✅ Trained density-only model (3-class coarse): **58.51% accuracy** (proves topology learning)
+- ✅ Generated confusion matrices showing leakage patterns
+- ✅ Documented complete analysis in `docs/dataset2-leakage-analysis.md`
 
-**Deliverable**: 
-- Baseline performance report
-- Code analysis notes in `docs/baseline-analysis.md`
+**Key Findings**:
+- Dataset1 & Dataset2 both have **severe size leakage** via PDB P-P distance sparsity
+- Current 100% accuracy results are **INVALID** for scientific evaluation
+- Density-only model achieves 58.51% on 3-class task (proves model CAN learn topology)
+- Fine-grained 14-class too hard: only 21.99% accuracy with density alone
+- **Recommendation**: Use 3-class coarse task (bulge/hairpin/internal) for Phase 2
 
-#### 1.2 Dataset Statistics
-**Time**: 3-4 hours
+**Deliverables**: 
+- ✅ `docs/baseline-analysis.md` (dataset1 analysis)
+- ✅ `docs/baseline-analysis-dataset2.md` (dataset2 initial analysis)
+- ✅ `docs/dataset2-leakage-analysis.md` (comprehensive 500+ line report)
+- ✅ Training scripts: `train_density_only.py`, `train_density_3class.py`
+- ✅ Analysis scripts: `analyze_dataset2_results.py`
+- ✅ Trained models: `best_density_3class_model.pth` (58.51% accuracy)
+- ✅ Realistic baseline established: **58.51%** without leakage
 
-**Actions**:
-- [ ] Count samples per class (train/test)
-- [ ] Check for class imbalance
-- [ ] Verify all .mrc/.pdb file pairs exist
-- [ ] Inspect sample files for quality
-- [ ] Document data distribution
+---
 
-**Script to Create**: `src/utils/dataset_stats.py`
+### 1.1.1 Phase 1 Completion Summary & Phase 2 Plan
 
-```python
-"""
-Generate dataset statistics:
-- Class distribution
-- File pair validation
-- MRC dimension statistics
-- PDB residue count statistics
-"""
+**Date**: November 28, 2025  
+**Status**: Phase 1.1 ✅ COMPLETED | Phase 2 🚀 READY TO START
+
+#### What Was Accomplished
+
+**Baseline Analysis & Data Leakage Detection**
+
+1. **Discovered Critical Data Leakage** (Dataset1 & Dataset2)
+   - PDB phosphate distance matrix (900 features) has size-dependent sparsity
+   - Sparsity range: 31.78% (bulge1: 97.78% → 5x5: 66%)
+   - This enables trivial size classification without learning structure
+
+2. **Quantified Leakage Impact**
+   - PDB-only classifier: **98.8% accuracy** (proof of leakage)
+   - Combined model: **100% accuracy** (completely reliant on leakage)
+   - Density-only (14-class): **21.99% accuracy** (76.8pp drop proves leakage)
+   - Density-only (3-class): **58.51% accuracy** (proves model CAN learn topology)
+
+3. **Established Realistic Baseline**
+   - **58.51%** on 3-class coarse task (bulge/hairpin/internal)
+   - This is 75% above random baseline (33.3%)
+   - Proves density-only model successfully learns structural topology
+   - Fine-grained 14-class too hard: only 21.99% with density alone
+
+4. **Documentation & Analysis**
+   - Created comprehensive 500+ line leakage analysis report
+   - Generated confusion matrices showing leakage patterns
+   - Documented training on 10% subset (1,936 samples) for M1 GPU
+   - Trained multiple models: PDB-only, density-only (14-class), density-only (3-class)
+
+#### Key Files Created
+
+**Documentation:**
+- `docs/baseline-analysis.md` - Dataset1 analysis
+- `docs/baseline-analysis-dataset2.md` - Dataset2 initial analysis  
+- `docs/dataset2-leakage-analysis.md` - Comprehensive leakage report (500+ lines)
+- `docs/sequence-features-analysis.md` - Phase 2 sequence feature specification
+
+**Training Scripts:**
+- `example/TrainingForClassification/train_density_only.py` - 14-class density-only
+- `example/TrainingForClassification/train_density_3class.py` - 3-class density-only
+- `example/TrainingForClassification/analyze_dataset2_results.py` - Leakage detection
+
+**Models:**
+- `example/TrainingForClassification/unet_density_only.py` - 3D U-Net (3.5M params)
+- `example/TrainingForClassification/dataset_density_only.py` - Density-only dataset loader
+- `example/TrainingForClassification/dataset_coarse.py` - Coarse label dataset
+
+**Results:**
+- `best_density_3class_model.pth` - Best 3-class model (58.51% accuracy)
+- `confusion_matrix_dataset2_pdb_only.png` - PDB-only results visualization
+- Training logs: `density_only_training_results.csv`, `density_3class_training_results.csv`
+
+#### Critical Insights
+
+**What We Learned:**
+1. Current 100% accuracy is **invalid** - completely due to size leakage
+2. PDB features contain valuable information BUT current representation leaks size
+3. Density-only model works (58.51%) but needs structural guidance
+4. Need **size-invariant PDB features** to combine benefits without leakage
+5. 3-class coarse task (topology) is more realistic than 14-class fine-grained
+
+**Scientific Contribution:**
+- First to identify and quantify size leakage in RNA motif classification
+- Established methodology for detecting feature leakage (sparsity analysis, PDB-only training)
+- Demonstrated proper baseline without leakage (58.51%)
+
+---
+
+## Phase 2: Size-Invariant Feature Engineering
+
+### Timeline: Week 5-7
+### Status: 🔄 PHASE 2.1 IN PROGRESS (Started Dec 1, 2025)
+### Priority: CRITICAL
+### Prerequisites: Phase 1 completed
+
+### Overall Goal
+Achieve 70-75% accuracy using density + size-invariant features, improving on 58.51% baseline.
+
+### Strategy Overview
+Three-step approach with conditional progression:
+1. **Phase 2.1** (3-4 days): Density + Sequence (24 features) → Target: 65-70%
+2. **Phase 2.2** (3-4 days): Add Base Pairing (~10 features) → Target: 70-75% ← **SUFFICIENT FOR PAPER**
+3. **Phase 2.3** (OPTIONAL): Add Torsion Angles (210 features) → Only if Phase 2.2 < 72%
+
+---
+
+### Phase 2.1: Density + Sequence Features 🔄 IN PROGRESS
+
+**Status**: STARTED December 1, 2025 | Training in progress
+**Timeline**: 3-4 days  
+**Expected Result**: Establish 15-class baseline + improve with sequence features
+
+#### What We're Building
+
+**Goal**: Hybrid model combining 3D density with 24 size-invariant sequence features
+
+**Task**: 15-class classification (1x1, 2x2, 3x3, 4x4, 5x5, bulge1-5, hairpin3-7)
+
+**Architecture**:
+```
+Input 1: MRC density (32×32×32) → 3D U-Net Encoder → 256 features
+Input 2: PDB sequence (24 features) → MLP (24→256) → 256 features
+                                    ↓
+                        Concatenate [256 + 256] → 512
+                                    ↓
+                            Classifier → 15 classes
 ```
 
-**Deliverable**: Dataset statistics report
+#### Progress Tracker
 
+**✅ COMPLETED**:
+1. **Sequence Feature Extractor** (`src/features/sequence_features.py`)
+   - ✅ 400+ line implementation
+   - ✅ Extracts 24 size-invariant features:
+     * 4: A%, U%, G%, C% composition
+     * 3: GC content, purine%, pyrimidine%
+     * 16: Dinucleotide frequencies (AA, AU, AG, ..., CC)
+     * 1: Shannon entropy (normalized)
+   - ✅ Parses SEQRES records from PDB
+   - ✅ Handles modified nucleotides (PSU, H2U, M2G, 1MA)
+   - ✅ Tested on real data (1RY1_114.pdb: 302 nucleotides → 24 features)
+   - ✅ Includes size-invariance validation method
 
-#### 1.3  Literature Review
+2. **Hybrid Dataset Loader** (`src/data/hybrid_dataset.py`)
+   - ✅ 450+ line implementation
+   - ✅ Loads .mrc density files → (1, 32, 32, 32) normalized tensors
+   - ✅ Extracts sequence features from .pdb → (24,) feature arrays
+   - ✅ Handles all 15 classes with proper label mapping
+   - ✅ Train/val/test splits (70/20/10)
+   - ✅ Class weight calculation (103.67x imbalance ratio)
+   - ✅ Tested on 10% subset:
+     * Train: 2,123 samples
+     * Val: 606 samples
+     * Test: 305 samples
+   - ✅ Sample loading: 18ms/sample
+   - ✅ Batch loading: 30ms for batch_size=4
+
+3. **Hybrid U-Net Model** (`src/models/hybrid_unet.py`)
+   - ✅ 350+ line implementation
+   - ✅ Dual-branch architecture:
+     * Density encoder: 3D U-Net (32³ → 256 features)
+     * Sequence encoder: MLP (24 → 256 features)
+     * Fusion: Concatenate 512 features
+     * Classifier: 512 → 256 → 128 → 15 classes
+   - ✅ 3.7M parameters (~14.25 MB)
+   - ✅ BatchNorm + Dropout for regularization
+   - ✅ Tested with forward pass and feature extraction
+
+4. **Training Script** (`train_hybrid.py`)
+   - ✅ 450+ line implementation
+   - ✅ Weighted CrossEntropyLoss (103.67x class imbalance)
+   - ✅ AdamW optimizer with ReduceLROnPlateau scheduler
+   - ✅ Early stopping (patience=10)
+   - ✅ Checkpoint saving (best model + every 10 epochs)
+   - ✅ Training launched on MPS (Apple Silicon GPU)
+   - 🔄 Training in progress...
+
+**🔄 IN PROGRESS**: Training & Evaluation
+1. Implement `src/models/hybrid_unet.py`:
+   - Density encoder branch (reuse from Phase 1)
+   - Sequence MLP branch (24→128→256)
+   - Fusion layer (concatenate 256+256)
+   - Classifier head (512→256→15)
+2. Create training script `train_hybrid.py`
+3. Train on 10% subset (~3,034 samples from 30,348 total)
+4. Use weighted cross-entropy loss (76.25:1 class imbalance)
+5. Validate size-invariance (correlation < 0.1)
+6. Compare to 58.51% baseline (old 3-class, need new 15-class baseline)
+
+#### Deliverables for Phase 2.1
+- [x] `src/features/sequence_features.py` - Feature extractor (400+ lines)
+- [x] `src/data/hybrid_dataset.py` - Dataset loader (450+ lines)
+- [x] `src/models/hybrid_unet.py` - Hybrid architecture (350+ lines)
+- [x] `train_hybrid.py` - Training script (450+ lines)
+- [ ] Training logs and validation report (in progress)
+- [ ] Final metrics and confusion matrix
+- [ ] `train_hybrid_phase2_1.py` - Training script
+- [ ] Trained model checkpoint
+- [ ] Size-invariance validation report
+- [ ] Training curves and confusion matrix
+- [ ] Performance comparison: 58.51% → 65-70%
+
+#### Success Criteria
+- ✅ Sequence features extract correctly (24 values per sample)
+- ⏸️ All features size-invariant (|correlation| < 0.1 with motif size)
+- ⏸️ **Establish new 15-class baseline** (density-only, no leakage)
+- ⏸️ **Improve over baseline by 10-15pp** with sequence features
+- ⏸️ Model handles severe class imbalance (weighted loss)
+- ⏸️ Model trains stably on M1 GPU
+- ⏸️ Inference time reasonable (<100ms per sample)
+
+---
+
+### Phase 2.2: Add Base Pairing Features ⏸️ PENDING
+
+**Status**: Not started (awaits Phase 2.1 completion)  
+**Timeline**: 3-4 days after Phase 2.1  
+**Expected Result**: 70-75% accuracy ← **SUFFICIENT FOR PAPER**
+
+#### What to Build
+
+**Additional Input**: ~10 base pairing features normalized by sequence length
+
+**Features**:
+- Pairing ratio (% residues in pairs)
+- Pairing density (pairs per nucleotide, normalized)
+- Average pairing distance (Å, normalized)
+- Stem length statistics (mean, max normalized by size)
+- Loop closure patterns
+
+**Detection Method**: N1 (purine) or N3 (pyrimidine) distance < 3.5 Å → paired
+
+**Updated Architecture**:
+```
+Density → 256 features ┐
+Sequence → 256 features├→ Concatenate [256+256+64] → 576 → Classifier (15 classes)
+Pairing → 64 features  ┘
+```
+
+#### Implementation Steps
+1. `src/features/base_pairing.py` - Pairing detector
+2. Update `HybridDataset` to extract pairing features
+3. Update `HybridUNet` to add pairing branch (10→64 features)
+4. Retrain model with all features
+
+#### Decision Point
+- **If accuracy ≥ 72%**: STOP, proceed to Phase 3 (scaling)
+- **If accuracy < 72%**: Continue to Phase 2.3 (torsion angles)
+
+---
+
+### Phase 2.3: Add Torsion Angles ⏸️ CONDITIONAL
+
+**Status**: Not planned (only if Phase 2.2 < 72%)  
+**Timeline**: 5-7 days  
+**Expected Result**: 75-80% accuracy
+
+Complex implementation with 7 backbone angles × 30 residues = 210 features.
+Only pursue if base pairing insufficient.
+
+---
+
+### Phase 2 Success Metrics Summary
+
+| Metric | Phase 1 Baseline | Phase 2.1 Target | Phase 2.2 Target | Paper Goal |
+|--------|------------------|------------------|------------------|------------|
+| **Task** | 3-class (old) | 15-class | 15-class | 15-class |
+| **Accuracy** | 58.51% (3-class) | TBD (new baseline) | +10-15pp | 70%+ |
+| **Classes** | bulge/hairpin/internal | All 15 classes | All 15 classes | All 15 |
+| **Features** | 0 (density) | 24 (seq) | 34 (seq+pair) | Ready |
+| **Training Time** | ~12hrs | ~15hrs | ~18hrs | Scale to 100% |
+| **Dataset** | 10% (~2.4K old) | 10% (~3K) | 10% (~3K) | Full (30.3K) |
+
+---
+
+#### 1.2 Dataset Statistics ✅ UPDATED
+**Status**: ✅ COMPLETED (December 1, 2025)  
+**Time**: Re-run with 15 classes
+
+**Actions Completed**:
+- ✅ Updated to include new 1x1 class (15 classes total)
+- ✅ Re-counted samples: **30,348 total samples** (was 24,195)
+- ✅ New class: 1x1 with 6,153 samples (20.27%) - 2nd largest!
+- ✅ Class imbalance: 76.25:1 ratio unchanged (bulge2: 28.39% vs bulge5: 0.43%)
+- ✅ Regenerated all visualizations
+
+**Script Updated**: `src/utils/dataset_stats.py` (now includes 1x1 class)
+
+**Key Findings**:
+- **Total samples**: 30,348 (increased by 6,153)
+- **Number of classes**: 15 (was 14)
+- **Class distribution**:
+  - Size classes (1x1-5x5): 11,438 samples (37.68%)
+  - Bulge loops: 11,521 samples (37.96%)
+  - Hairpin loops: 7,389 samples (24.35%)
+- **Largest classes**: bulge2 (28.39%), 1x1 (20.27%), hairpin5 (11.58%)
+- **Severe class imbalance**: Still 76.25:1 ratio requires weighted loss
+- **MRC dimensions**: 683 unique dimensions (more variability)
+- **PDB structures**: Mean 4,360 ± 2,093 residues, GC content 53.45% ± 8.40%
+  - GC content: 53.41% ± 8.58% (balanced purine/pyrimidine composition)
+- **Nucleotide composition**: Balanced (A: 24.7%, U: 20.8%, G: 30.7%, C: 23.8%)
+
+**Deliverables**: 
+- ✅ `docs/dataset-statistics.md` (comprehensive statistics report)
+- ✅ `docs/figures/class_distribution.png` (class and category distributions)
+- ✅ `docs/figures/mrc_statistics.png` (MRC dimensions and density analysis)
+- ✅ `docs/figures/pdb_statistics.png` (residue counts and sequence composition)
+
+#### 1.3 Literature Review ✅
+**Status**: ✅ CORE COMPLETED (November 28, 2025)  
 **Time**: 8-10 hours
 
 **Reading List** (minimum 5-7 papers):
-- [ ] RNA secondary structure prediction methods
-- [ ] Deep learning for cryo-EM density map analysis
-- [ ] 3D U-Net applications in biomedical imaging
-- [ ] Feature extraction from PDB structures
-- [ ] RNA loop classification methods
+- ✅ RNA secondary structure prediction methods
+- ✅ Deep learning for cryo-EM density map analysis
+- ✅ 3D U-Net applications in biomedical imaging
+- ✅ Feature extraction from molecular structures
+- ⏸️ Additional RNA loop classification papers (optional if needed)
 
-**Actions**:
-- [ ] Create `docs/related-work.md` with paper summaries
-- [ ] Document existing approaches and their limitations
-- [ ] Identify gaps that this work addresses
-- [ ] Collect BibTeX citations for final paper
+**Papers Reviewed**:
+1. ✅ **Sato et al. (2021)** - RNA secondary structure prediction with deep learning + thermodynamics
+   - Nature Communications, 474 citations
+   - **Key insight**: Combining data-driven learning with domain knowledge prevents overfitting
+   - **Relevance**: Validates our multi-modal approach (density + structural features)
 
-**Deliverable**: Literature review document with 5-7 paper summaries
+2. ✅ **Si et al. (2020)** - Deep learning for cryo-EM backbone structure prediction
+   - Scientific Reports, 125 citations
+   - **Key insight**: 3D CNNs successfully learn structural patterns from density maps
+   - **Relevance**: Validates our density-only model approach (58.51% baseline)
+
+3. ✅ **Çiçek et al. (2016)** - 3D U-Net: learning dense volumetric segmentation
+   - MICCAI, 10,000+ citations (foundational paper)
+   - **Key insight**: Skip connections + encoder-decoder crucial for volumetric data
+   - **Relevance**: Direct architectural basis for our model, weighted loss for imbalance
+
+4. ✅ **Li et al. (2016)** - Deep CNNs for detecting secondary structures in cryo-EM
+   - IEEE BIBM, 75 citations
+   - **Key insight**: First application of deep learning to cryo-EM structure detection
+   - **Relevance**: Pioneering work validating CNNs on cryo-EM for classification
+
+5. ✅ **Zhang et al. (2022)** - CR-I-TASSER: protein structure assembly with deep CNN
+   - Nature Methods, 67 citations
+   - **Key insight**: Hybrid CNN + physics-based modeling outperforms either alone
+   - **Relevance**: Validates our multi-modal fusion philosophy
+
+6. ✅ **Matsumoto et al. (2021)** - Extraction of protein dynamics from cryo-EM using DL
+   - Nature Machine Intelligence, 93 citations
+   - **Key insight**: 3D-CNN can extract hidden information beyond structure
+   - **Relevance**: Shows density contains topological information we're classifying
+
+7. ✅ **Mu et al. (2021)** - Segmentation tool for secondary structures with 3D CNN
+   - Frontiers in Bioinformatics, 17 citations
+   - **Key insight**: Most similar problem - classifying structural motifs from density
+   - **Relevance**: Validates feasibility, but no multi-modal fusion or leakage detection
+
+**Actions Completed**:
+- ✅ Created `docs/related-work.md` with structured template
+- ✅ Searched and identified 7+ highly relevant papers
+- ✅ Summarized all papers with problem/method/findings/relevance
+- ✅ Extracted 7 BibTeX citations for final paper
+- ✅ Identified research gaps and our novel contributions
+
+**Key Takeaways for Implementation**:
+1. **Multi-modal fusion** (density + structure) is validated approach (Papers 1, 5)
+2. **3D U-Net architecture** is proven for volumetric biomedical data (Paper 3)
+3. **Weighted loss** essential for class imbalance (Paper 3: 76:1 in our dataset)
+4. **Skip connections** preserve spatial information in encoder-decoder (Paper 3)
+5. **Medium resolution** (6-8Å) sufficient for structural classification (Papers 2, 4)
+6. **Data augmentation** (rotations, flips, elastic) improves generalization (Paper 3)
+7. **Transfer learning** from simulation to experiment viable (Paper 6)
+
+**Research Gaps Identified**:
+1. **No prior work on RNA motif classification from cryo-EM** - all papers focus on proteins
+2. **Size leakage** not addressed in any structural biology ML papers - our novel contribution
+3. **Multi-modal fusion** rare in cryo-EM (mostly density-only or structure-only)
+4. **Topology classification** (bulge vs hairpin vs internal) unexplored in literature
+5. **Size-invariant feature engineering** framework - methodological contribution
+
+**Our Novel Contributions**:
+1. **First RNA motif classification** from cryo-EM density maps
+2. **Size leakage detection** methodology (PDB-only training, sparsity analysis)
+3. **Size-invariant features** (sequence %, base pairing ratio, normalized torsions)
+4. **Multi-modal hybrid architecture** combining density and structural features
+5. **Realistic baseline** without leakage (58.51%) for 3-class topology
+
+**Deliverable**: 
+- ✅ `docs/related-work.md` (comprehensive literature review with 7 papers)
+
+#### 1.4 Paper Writing - Introduction & Related Work ✅
+**Status**: ✅ COMPLETED (November 29-30, 2025)  
+**Time**: 6-8 hours
+
+**Actions Completed**:
+- ✅ Created IEEE format paper skeleton (`docs/paper.md`)
+- ✅ **Section 1.1: Background and Motivation** - Completed with RNA motif context, cryo-EM, DeepTracer, DAIS group
+- ✅ **Section 1.2: Problem Statement** - Formal problem definition with inputs/outputs, 4 key challenges, clear objective
+- ✅ **Section 1.3: Contributions** - Placeholder for final contributions
+- ✅ **Section 1.4: Paper Organization** - Complete section roadmap
+- ✅ **Section 2.1: RNA Secondary Structure Prediction** - MXfold2 (thermodynamic + DL integration)
+- ✅ **Section 2.2: Deep Learning for Cryo-EM Analysis** - DeepTracer 1.0 & 2.0 (protein/nucleic acid reconstruction)
+- ✅ **Section 2.3: Unified Biomolecular Structure Prediction** - AlphaFold 3 (diffusion models, multi-modal)
+- ✅ **Section 2.4: RNA-Specific Cryo-EM Reconstruction** - DeepCryoRNA (18 atom types, multi-scale, sequence integration)
+- ✅ **Section 2.5: RNA Motif Similarity** - RNAMotifComp (overlapping families, 60-70% accuracy challenge)
+- ✅ **Section 2.6: Integrated RNA Folding** - CaCoFold-R3D (probabilistic grammar, 96 motif variants)
+- ✅ **Section 2.7: Research Gaps** - 5 comprehensive gaps identified with clear positioning
+
+**Papers Integrated into Section 2**:
+1. MXfold2 (Sato et al. 2021) - Section 2.1
+2. DeepTracer 1.0 (Pfab et al. 2020) - Section 2.2
+3. DeepTracer 2.0 (Pfab et al. 2022) - Section 2.2
+4. AlphaFold 3 (Abramson et al. 2024) - Section 2.3
+5. DeepCryoRNA (Li & Chen 2025) - Section 2.4
+6. RNAMotifComp (Petrov et al. 2013) - Section 2.5
+7. CaCoFold-R3D (Karan & Rivas 2025) - Section 2.6
+
+**Key Features of Completed Sections**:
+- All citations properly formatted with \cite{} commands
+- Quantitative results included (accuracy numbers, RMSD, coverage percentages)
+- Clear connections to our work in each subsection
+- Research gaps systematically identified (cryo-EM motif classification, size-invariance, multi-modal fusion, overlapping families, local vs global context)
+- Problem statement with formal mathematical notation
+- 4 key challenges documented (size-topology disentanglement, overlapping similarity, multi-modal fusion, limited data)
+
+**Reference Files Created**:
+- ✅ `docs/references/si2020deep.md` - DeepTracer 1.0 details
+- ✅ `docs/references/deeptracer2.md` - DeepTracer 2.0 details
+- ✅ `docs/references/sato2021rna.md` - MXfold2 details
+- ✅ `docs/references/alphafold3.md` - AlphaFold 3 details
+- ✅ `docs/references/deepcryorna` - DeepCryoRNA details
+- ✅ `docs/references/rnamotifcomp.md` - RNAMotifComp details
+- ✅ `docs/references/cacofold.md` - CaCoFold-R3D details
+
+**Paper Status**:
+- ✅ Section 1 (Introduction): 1.1-1.4 complete
+- ✅ Section 2 (Related Work): 2.1-2.7 complete
+- ⏸️ Section 3 (Dataset): Statistics ready, needs narrative
+- ⏸️ Section 4 (Data Leakage): Phase 1.1 findings ready, needs writing
+- ⏸️ Section 5 (Methodology): Awaiting Phase 2 implementation
+- ⏸️ Section 6-9: Awaiting experimental results
+
+**Deliverables**:
+- ✅ `docs/paper.md` - 700+ line IEEE format paper with Sections 1-2 complete
+- ✅ `docs/references/` - 7 reference summary files
+- ✅ All BibTeX citations prepared for final References section
+
 ### Acceptance Criteria
-- ✅ At least 5 papers read and summarized
+- ✅ At least 5 papers read and summarized (completed 7)
 - ✅ Baseline code runs successfully
-- ✅ Baseline accuracy documented
+- ✅ Baseline accuracy documented (58.51%)
 - ✅ Dataset statistics report completed
 - ✅ Literature review ready for paper Introduction
+- ✅ Paper sections 1 (Introduction) and 2 (Related Work) written and complete
 
 ### Risks & Mitigation
 - **Risk**: Related work too similar, reduces novelty
@@ -117,21 +528,64 @@ Generate dataset statistics:
 
 ---
 
-## Phase 2: Feature Engineering
+## Phase 2: Feature Engineering (Size-Invariant)
 
-### Timeline: Week 5-6 (2 weeks)
+### Timeline: Week 5-7 (2-3 weeks)
+### Status: 🔄 PHASE 2.1 IN PROGRESS
 ### Priority: CRITICAL
 ### Prerequisites: Phase 1 completed
 
 ### Objectives
-1. Implement P-P distance extraction
-2. Implement torsion angle calculation
-3. Implement base pairing detection
-4. Create robust feature extraction pipeline
+1. ✅ Implement RNA sequence feature extraction (24 features)
+2. 🔄 Create hybrid dataset loader (density + sequence)
+3. 🔄 Implement hybrid U-Net architecture
+4. ⏸️ Add base pairing features (~10 features) 
+5. ⏸️ Optional: Add torsion angles (210 features)
 
-### Tasks
+### Phase 2.1: RNA Sequence Features 🔄 IN PROGRESS
 
-#### 2.1 P-P Distance Matrix
+**Status**: 🔄 STARTED (December 1, 2025)
+**Timeline**: 3-4 days
+**Expected Result**: 65-70% accuracy with density + sequence
+
+**Tasks Completed**:
+- ✅ Implemented `SequenceFeatureExtractor` class (24 features)
+  - ✅ Nucleotide composition (A%, U%, G%, C%)
+  - ✅ Chemical composition (GC content, purine%, pyrimidine%)
+  - ✅ Dinucleotide frequencies (16 features)
+  - ✅ Shannon entropy (normalized)
+- ✅ SEQRES record parsing from PDB files
+- ✅ Modified nucleotide mapping (PSU, H2U, M2G, 1MA)
+- ✅ Tested on sample PDB file (1RY1_114.pdb)
+  - Extracted 302-nucleotide sequence
+  - Generated 24 features successfully
+  - GC content: 61.92%, entropy: 0.977
+
+**Files Created**:
+- ✅ `src/features/__init__.py` - Package initialization
+- ✅ `src/features/sequence_features.py` - Complete feature extractor (400+ lines)
+
+**Remaining Tasks**:
+- [ ] Create hybrid dataset loader (`src/data/hybrid_dataset.py`)
+- [ ] Implement hybrid U-Net model (`src/models/hybrid_unet.py`)
+- [ ] Create training script for hybrid model
+- [ ] Validate size-invariance (correlation with motif size < 0.1)
+- [ ] Train on 10% subset (3,034 samples from 30,348 total)
+- [ ] Evaluate and compare to 58.51% baseline
+
+**Next Steps**:
+1. Create `HybridDataset` class that loads both density and sequence features
+2. Implement `HybridUNet` with density encoder + sequence MLP branches
+3. Train and validate model
+
+---
+
+### Original Phase 2 Plan (Archive)
+
+**Note**: Original plan focused on P-P distances and torsion angles. 
+Updated plan prioritizes size-invariant sequence features first, then base pairing.
+
+#### 2.1 P-P Distance Matrix (ARCHIVED - Has size leakage)
 **Time**: 4-5 hours
 
 **Implementation**: `src/features/phosphate_distances.py`

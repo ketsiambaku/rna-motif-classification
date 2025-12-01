@@ -1,35 +1,68 @@
 ---
 module-name: "RNA Motif Classification"
-version: "0.1.0"
-description: "Deep learning system for classifying RNA secondary structure motif types (bulge loops, internal loops, hairpin loops) from cryo-EM density maps and structural features"
+version: "0.4.0"
+description: "Deep learning system for classifying RNA secondary structure motif types (bulge loops, internal loops, hairpin loops) from cryo-EM density maps with size-invariant structural features"
+status: "Phase 1 Complete | Paper Sections 1-2 Complete | Phase 2 Ready"
+phase: "Feature Engineering (Size-Invariant PDB Features) + Paper Writing"
 related-modules:
   - name: Example Training Code
     path: ./example/TrainingForClassification
   - name: Project Documentation
     path: ./docs
+  - name: Development Phases (includes Phase 1.4 paper writing)
+    path: ./docs/development-phases.md
+  - name: Leakage Analysis Report
+    path: ./docs/dataset2-leakage-analysis.md
+  - name: Dataset Statistics Report
+    path: ./docs/dataset-statistics.md
+  - name: Literature Review
+    path: ./docs/related-work.md
+  - name: IEEE Format Paper (Sections 1-2 Complete)
+    path: ./docs/paper.md
+  - name: Reference Summaries
+    path: ./docs/references/
 architecture:
-  style: "Deep Learning Pipeline with Multi-Modal Fusion"
+  style: "Hybrid Deep Learning with Multi-Modal Fusion (Density + Size-Invariant Features)"
   components:
     - name: "Data Processing"
-      description: "MRC density map loading, PDB feature extraction, data augmentation"
-    - name: "Feature Engineering"
-      description: "P-P distances, torsion angles, base pairing matrix extraction from PDB structures"
+      description: "MRC density map loading, size-invariant PDB feature extraction"
+    - name: "Size-Invariant Feature Engineering"
+      description: "RNA sequence features, base pairing topology, torsion angles (optional)"
+      status: "In Development"
     - name: "Model Architectures"
-      description: "U-Net classifier and 3D CNN for volumetric density classification"
+      description: "Density-only U-Net (baseline: 58.51%) + Hybrid U-Net (target: 70-75%)"
     - name: "Training Pipeline"
-      description: "PyTorch training loop with validation, checkpointing, and metrics tracking"
+      description: "PyTorch training with M1 GPU optimization, class weighting, early stopping"
     - name: "Evaluation"
-      description: "Classification metrics, confusion matrices, model comparison"
+      description: "Leakage detection, classification metrics, ablation studies"
   patterns:
     - name: "Multi-Modal Fusion"
-      usage: "Combines 3D volumetric density data with structural features from PDB files"
-    - name: "Transfer Learning"
-      usage: "Pre-trained feature extractors adapted for RNA structure classification"
+      usage: "Combines 3D volumetric density with size-invariant sequence and pairing features"
+    - name: "Leakage Detection"
+      usage: "PDB-only training, sparsity analysis, correlation with problem-specific artifacts"
     - name: "Data Augmentation"
-      usage: "3D rotations, flips, and noise injection to increase effective dataset size"
+      usage: "3D rotations, flips, noise injection (planned for Phase 3)"
+key-findings:
+  - name: "Data Leakage Discovery"
+    description: "PDB phosphate distance matrix has 31.78% sparsity range encoding motif size"
+    impact: "76.8pp accuracy inflation (98.8% → 21.99%)"
+    solution: "Size-invariant features: sequence + base pairing + torsion angles (optional)"
+  - name: "Realistic Baseline"
+    description: "Density-only 3D U-Net achieves 58.51% on 3-class topology classification"
+    significance: "Proves model CAN learn structural patterns without leakage"
+  - name: "Task Selection"
+    description: "3-class coarse (bulge/hairpin/internal) is realistic vs 14-class fine-grained (21.99%)"
+  - name: "Literature Review Complete"
+    description: "7 papers integrated covering RNA structure, cryo-EM, deep learning, motif analysis"
+    papers: "MXfold2, DeepTracer 1.0/2.0, AlphaFold 3, DeepCryoRNA, RNAMotifComp, CaCoFold-R3D"
+    impact: "Identified 5 research gaps positioning our work (cryo-EM motif classification, size-invariance, multi-modal fusion, overlapping families, local/global context)"
+  - name: "Paper Progress"
+    description: "IEEE format paper Sections 1 (Introduction) and 2 (Related Work) complete"
+    content: "Problem statement with formal notation, 4 key challenges, 7 comprehensive subsections covering state-of-the-art"
+    status: "700+ lines written, ready for Methodology section after Phase 2 implementation"
 development:
   stack:
-    - PyTorch
+    - PyTorch (with MPS for Apple Silicon M1)
     - BioPython
     - mrcfile
     - NumPy
@@ -37,8 +70,13 @@ development:
     - scikit-learn
   setup:
     - "Python 3.8+"
-    - "CUDA-capable GPU recommended"
+    - "Apple Silicon M1 GPU (MPS) or CUDA-capable GPU"
     - "Install: pip install torch biopython mrcfile numpy pandas scikit-learn"
+  current-phase:
+    phase: "2.1"
+    task: "Implementing RNA sequence feature extraction"
+    timeline: "Week 5 (3-4 days)"
+    expected-result: "65-70% accuracy with density + sequence features"
 ---
 
 # RNA Motif Classification
@@ -174,6 +212,11 @@ dataset/
 - Training loop with validation
 - Basic preprocessing and dataset loading
 
+**Phase 1 - Research & Understanding**: IN PROGRESS
+1. Baseline code analysis and performance measurement
+2. Dataset statistics generation
+3. Literature review for paper background
+
 **Planned Enhancements**:
 1. Add torsion angle extraction
 2. Add base pairing detection
@@ -231,12 +274,13 @@ rna-motif-classification/
 
 ## Development Workflow
 
-1. **Feature Implementation**: Start with additional PDB feature extractors
-2. **Model Development**: Implement CNN baseline, then multi-channel U-Net
-3. **Experimentation**: Train models with different feature combinations
-4. **Evaluation**: Compare performance with statistical tests
-5. **Documentation**: Maintain ACM paper format throughout
-6. **Reproducibility**: Document all hyperparameters and random seeds
+1. **Baseline Analysis**: Understand and document current implementation
+2. **Feature Implementation**: Add PDB feature extractors (torsion angles, base pairing)
+3. **Model Development**: Implement CNN baseline, then multi-channel U-Net
+4. **Experimentation**: Train models with different feature combinations
+5. **Evaluation**: Compare performance with statistical tests
+6. **Documentation**: Maintain ACM paper format throughout
+7. **Reproducibility**: Document all hyperparameters and random seeds
 
 ## Contributing Guidelines
 

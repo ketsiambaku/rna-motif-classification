@@ -1,0 +1,44 @@
+Here’s a literature-review style subsection on **DeepCryoRNA** you can plug into your report.
+
+---
+
+### DeepCryoRNA: Deep Learning–Based RNA Structure Reconstruction from Cryo-EM Maps
+
+Most existing cryo-EM map-to-model tools—DeepTracer, ModelAngelo, EMBuild, CR-I-TASSER, etc.—were originally designed with **proteins** in mind and only later extended to nucleic acids. This makes fully automatic **RNA** model building particularly challenging, because RNAs are often more flexible, heterogeneous and structurally diverse than proteins, and cryo-EM maps frequently contain mixtures of proteins and nucleic acids.([ResearchGate][1])
+
+**DeepCryoRNA** (Li & Chen, 2025) is a preprint that targets this gap with a method specifically tailored to **RNA 3D structure reconstruction from cryo-EM maps**. The goal is: given an experimental cryo-EM density map and the corresponding RNA sequence, automatically build an all-atom RNA model at high to medium resolutions (up to ~6 Å).([ResearchGate][1])
+
+#### Model and workflow
+
+At a high level, DeepCryoRNA follows the general pattern of recent deep learning map-to-model tools:
+
+1. **Voxel-wise prediction** from cryo-EM density using a 3D CNN, and
+2. **Geometric + sequence-based post-processing** to turn predicted “atom likelihoods” into a consistent atomic model.
+
+According to available summaries, DeepCryoRNA uses a **specialized 3D U-Net-style architecture** that operates on local 3D patches of the density map and predicts multiple RNA atom types at each voxel. One report notes that the network is trained to distinguish **18 RNA atom types**, significantly richer than earlier methods that only classify backbone vs base or a few representative atoms.([CSDN Blog][2]) This per-atom classification is meant to improve the precision of atom placement (especially in the sugar-phosphate backbone) and to better support downstream sequence assignment.
+
+To improve robustness across resolutions, DeepCryoRNA uses a **multi-scale training strategy**: the network is trained on two different patch sizes (a smaller patch for local detail and a larger patch for broader context) and combines their predictions. This helps the model handle both high-resolution features (individual atoms, ring density) and medium-resolution cues (helical tubes, backbone traces), and is reported to outperform a single-patch baseline, particularly on more challenging maps.([CSDN Blog][2])
+
+The second key component is a **global sequence alignment module**. After atom-type probabilities are predicted and an approximate backbone is reconstructed, DeepCryoRNA aligns the known RNA sequence to the predicted atomic trace to decide which nucleotide goes where. This is analogous in spirit to the sequence-assignment step in DeepTracer/DeepTracer-2.0 for proteins, but adapted to RNA and to the richer per-atom predictions. The authors emphasize that this global alignment significantly improves sequence assignment accuracy compared with simpler local heuristics.([ResearchGate][1])
+
+#### Benchmarking and performance
+
+DeepCryoRNA is evaluated on a **benchmark of 51 RNA structures** resolved by cryo-EM at resolutions **better than 6.0 Å**, covering a range of sizes and resolutions in the high- to medium-resolution regime.([ResearchGate][1]) Across this dataset, DeepCryoRNA is reported to achieve:
+
+* **Lower RMSD** and more accurate atomistic models than previous deep learning–based RNA tools such as **CryoREAD** and RNA-capable variants of **DeepTracer**, especially on higher-resolution maps.([ResearchGate][3])
+* **Consistently high accuracy for maps with resolution better than ~4.5 Å**, with more variability but still competitive performance toward 6 Å.([CSDN Blog][2])
+
+These results position DeepCryoRNA among the most accurate **RNA-specific** cryo-EM map-to-model methods reported so far, complementing other recent nucleic-acid tools such as EMRNA and EM2NA that also use deep learning for nucleotide detection and backbone tracing.([ResearchGate][4])
+
+In broader surveys of AI methods for cryo-EM model building, DeepCryoRNA is cited as a representative example of next-generation **RNA-focused** map-to-model pipelines: it directly targets nucleic acids, predicts atom types instead of just backbone probability, and integrates a dedicated global sequence-assignment step.([ResearchGate][4])
+
+#### Relevance and remaining gaps
+
+DeepCryoRNA shows that a **U-Net-style 3D CNN** plus careful post-processing can reconstruct high-quality **all-atom RNA models** from density alone, and that **fine-grained atom-type prediction + global sequence alignment** is a powerful combination for RNA maps. However, like DeepTracer-2.0, CryoREAD, EMRNA and EM2NA, it is primarily designed as a **full map-to-model reconstruction tool**. Its outputs are complete RNA backbones and bases, not explicit labels for **motifs** (e.g., 1×1 internal loops vs 2×3 junctions).
+
+For your project, this means DeepCryoRNA is important background as the **state of the art in RNA-only cryo-EM reconstruction**, but it still leaves open the more targeted problem you’re tackling: **motif-level classification** of RNA regions (e.g., from a 64³ density cube plus PDB-derived features) rather than full de novo rebuilding.
+
+[1]: https://www.researchgate.net/publication/351529269_Full-length_de_novo_protein_structure_determination_from_cryo-EM_maps_using_deep_learning?utm_source=chatgpt.com "Full-length de novo protein structure determination from ..."
+[2]: https://blog.csdn.net/itwangyang520/article/details/147194411?utm_source=chatgpt.com "AIDD-人工智能药物设计-融合多源知识，精准预测蛋白质功能"
+[3]: https://www.researchgate.net/publication/363079323_The_promise_of_cryo-EM_to_explore_RNA_structural_dynamics?utm_source=chatgpt.com "The promise of cryo-EM to explore RNA structural dynamics"
+[4]: https://www.researchgate.net/publication/367336783_Fast_and_automated_protein-DNARNA_macromolecular_complex_modeling_from_cryo-EM_maps?utm_source=chatgpt.com "Fast and automated protein-DNA/RNA macromolecular ..."

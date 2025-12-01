@@ -17,7 +17,13 @@ class RNADensityDataset(Dataset):
     def extract_density(self, filepath):
         with mrcfile.open(filepath, permissive=True) as mrc:
             data = mrc.data.astype(np.float32)
-        data = (data - data.min()) / (data.max() - data.min())
+        
+        # Check if data is 3D, skip if not
+        if data.ndim != 3:
+            # Return zero tensor if invalid dimensions
+            return torch.zeros((1, *self.target_shape), dtype=torch.float32)
+        
+        data = (data - data.min()) / (data.max() - data.min() + 1e-8)
         data = torch.tensor(data).unsqueeze(0).unsqueeze(0)  # [1,1,D,H,W]
         return F.interpolate(data, size=self.target_shape, mode='trilinear', align_corners=False).squeeze(0)
 
