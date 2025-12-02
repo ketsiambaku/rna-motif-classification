@@ -81,11 +81,12 @@ class Trainer:
         for batch in pbar:
             density = batch['density'].to(self.device)
             sequence = batch['sequence'].to(self.device)
+            pairing = batch['pairing'].to(self.device)
             labels = batch['label'].to(self.device)
             
             # Forward pass
             self.optimizer.zero_grad()
-            logits = self.model(density, sequence)
+            logits = self.model(density, sequence, pairing)
             loss = self.criterion(logits, labels)
             
             # Backward pass
@@ -119,6 +120,7 @@ class Trainer:
         
         all_preds = []
         all_labels = []
+        all_probs = []  # Store probabilities for ROC curves
         
         with torch.no_grad():
             pbar = tqdm(self.val_loader, desc=f'Epoch {epoch+1}/{self.n_epochs} [Val]  ')
@@ -126,11 +128,15 @@ class Trainer:
             for batch in pbar:
                 density = batch['density'].to(self.device)
                 sequence = batch['sequence'].to(self.device)
+                pairing = batch['pairing'].to(self.device)
                 labels = batch['label'].to(self.device)
                 
                 # Forward pass
-                logits = self.model(density, sequence)
+                logits = self.model(density, sequence, pairing)
                 loss = self.criterion(logits, labels)
+                
+                # Get probabilities for ROC curves
+                probs = torch.softmax(logits, dim=1)
                 
                 # Statistics
                 running_loss += loss.item() * density.size(0)
@@ -138,9 +144,10 @@ class Trainer:
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
                 
-                # Store for confusion matrix
+                # Store for confusion matrix and ROC curves
                 all_preds.extend(predicted.cpu().numpy())
                 all_labels.extend(labels.cpu().numpy())
+                all_probs.extend(probs.cpu().numpy())
                 
                 # Update progress bar
                 pbar.set_postfix({
@@ -151,7 +158,7 @@ class Trainer:
         epoch_loss = running_loss / total
         epoch_acc = 100.0 * correct / total
         
-        return epoch_loss, epoch_acc, np.array(all_preds), np.array(all_labels)
+        return epoch_loss, epoch_acc, np.array(all_preds), np.array(all_labels), np.array(all_probs)
     
     def train(self):
         """Full training loop."""
@@ -173,7 +180,7 @@ class Trainer:
             train_loss, train_acc = self.train_epoch(epoch)
             
             # Validate
-            val_loss, val_acc, val_preds, val_labels = self.validate(epoch)
+            val_loss, val_acc, val_preds, val_labels, val_probs = self.validate(epoch)
             
             # Update learning rate
             if self.scheduler is not None:
@@ -213,9 +220,10 @@ class Trainer:
                 
                 print(f"  ✓ New best model saved! Val Acc: {val_acc:.2f}%")
                 
-                # Save confusion matrix for best model
+                # Save confusion matrix and probabilities for best model
                 np.save(self.save_dir / 'best_val_preds.npy', val_preds)
                 np.save(self.save_dir / 'best_val_labels.npy', val_labels)
+                np.save(self.save_dir / 'best_val_probs.npy', val_probs)
             else:
                 self.patience_counter += 1
                 print(f"  No improvement ({self.patience_counter}/{self.early_stopping_patience})")
@@ -257,41 +265,73 @@ class Trainer:
 
 
 def compute_class_metrics(preds, labels, class_names):
-    """Compute per-class precision, recall, F1."""
-    from sklearn.metrics import precision_recall_fscore_support, confusion_matrix
+    """Compute per-class precision, recall, F1, and accuracy."""
+    from sklearn.metrics import precision_recall_fscore_support, confusion_matrix, accuracy_score
     
     precision, recall, f1, support = precision_recall_fscore_support(
         labels, preds, average=None, zero_division=0
     )
     
+    # Confusion matrix
+    cm = confusion_matrix(labels, preds)
+    
+    # Per-class accuracy (diagonal of normalized confusion matrix)
+    per_class_accuracy = np.zeros(len(class_names))
+    for i in range(len(class_names)):
+        if i < len(cm) and support[i] > 0:
+            per_class_accuracy[i] = cm[i, i] / support[i]
+    
+    # Overall accuracy
+    overall_acc = accuracy_score(labels, preds)
+    
     print("\nPer-Class Metrics:")
-    print(f"{'Class':<12} {'Precision':>10} {'Recall':>10} {'F1':>10} {'Support':>10}")
-    print("-" * 60)
+    print(f"{'Class':<18} {'Accuracy':>10} {'Precision':>10} {'Recall':>10} {'F1':>10} {'Support':>10}")
+    print("-" * 78)
     
     for i, class_name in enumerate(class_names):
         if i < len(precision):
-            print(f"{class_name:<12} {precision[i]:>10.4f} {recall[i]:>10.4f} "
-                  f"{f1[i]:>10.4f} {support[i]:>10}")
+            print(f"{class_name:<18} {per_class_accuracy[i]:>10.4f} {precision[i]:>10.4f} "
+                  f"{recall[i]:>10.4f} {f1[i]:>10.4f} {support[i]:>10}")
     
     # Macro averages
     macro_p = precision.mean()
     macro_r = recall.mean()
     macro_f1 = f1.mean()
+    macro_acc = per_class_accuracy.mean()
     
-    print("-" * 60)
-    print(f"{'Macro Avg':<12} {macro_p:>10.4f} {macro_r:>10.4f} {macro_f1:>10.4f}")
+    print("-" * 78)
+    print(f"{'Macro Avg':<18} {macro_acc:>10.4f} {macro_p:>10.4f} {macro_r:>10.4f} {macro_f1:>10.4f}")
+    print(f"{'Overall Accuracy':<18} {overall_acc:>10.4f}")
     
-    # Confusion matrix
-    cm = confusion_matrix(labels, preds)
+    # Print confusion matrix
+    print("\nConfusion Matrix:")
+    print(f"{'':>18}", end='')
+    for name in class_names:
+        print(f"{name[:8]:>9}", end='')
+    print()
+    print("-" * (18 + 9 * len(class_names)))
+    
+    for i, true_class in enumerate(class_names):
+        if i < len(cm):
+            print(f"{true_class:<18}", end='')
+            for j in range(len(class_names)):
+                if j < len(cm[i]):
+                    print(f"{cm[i][j]:>9}", end='')
+                else:
+                    print(f"{'0':>9}", end='')
+            print()
     
     return {
+        'accuracy': per_class_accuracy.tolist(),
         'precision': precision.tolist(),
         'recall': recall.tolist(),
         'f1': f1.tolist(),
         'support': support.tolist(),
+        'macro_accuracy': float(macro_acc),
         'macro_precision': float(macro_p),
         'macro_recall': float(macro_r),
         'macro_f1': float(macro_f1),
+        'overall_accuracy': float(overall_acc),
         'confusion_matrix': cm.tolist()
     }
 
@@ -323,10 +363,10 @@ def main():
         'dataset_root': 'dataset2',
         'batch_size': args.batch_size,
         'num_workers': args.num_workers,
-        'n_epochs': 50,
+        'n_epochs': 100,  # Increased for full dataset training
         'learning_rate': 0.001,
         'weight_decay': 1e-4,
-        'early_stopping_patience': 10,
+        'early_stopping_patience': 7,  # Reduced from 10 to prevent overfitting
         'use_subset': args.use_subset,
         'random_seed': 42,
         'device': device_str,
@@ -375,6 +415,14 @@ def main():
         consolidate=config['consolidate']
     )
     
+    test_dataset = HybridDataset(
+        root_dir=config['dataset_root'],
+        split='test',
+        use_subset=config['use_subset'],
+        random_seed=config['random_seed'],
+        consolidate=config['consolidate']
+    )
+    
     # Create data loaders
     train_loader = DataLoader(
         train_dataset,
@@ -385,6 +433,13 @@ def main():
     
     val_loader = DataLoader(
         val_dataset,
+        batch_size=config['batch_size'],
+        shuffle=False,
+        num_workers=config['num_workers']
+    )
+    
+    test_loader = DataLoader(
+        test_dataset,
         batch_size=config['batch_size'],
         shuffle=False,
         num_workers=config['num_workers']
@@ -448,7 +503,7 @@ def main():
     
     # Load best model and evaluate
     print("\n" + "="*80)
-    print("Final Evaluation on Best Model")
+    print("Final Evaluation on Validation Set (Best Model)")
     print("="*80)
     
     checkpoint = torch.load(save_dir / 'best_model.pth')
@@ -459,14 +514,57 @@ def main():
     
     # Compute detailed metrics
     class_names = train_dataset.CONSOLIDATED_CLASS_NAMES if config['consolidate'] else train_dataset.CLASS_NAMES
-    metrics = compute_class_metrics(val_preds, val_labels, class_names)
+    val_metrics = compute_class_metrics(val_preds, val_labels, class_names)
     
-    # Save metrics
-    with open(save_dir / 'final_metrics.json', 'w') as f:
-        json.dump(metrics, f, indent=2)
+    # Save validation metrics
+    with open(save_dir / 'final_val_metrics.json', 'w') as f:
+        json.dump(val_metrics, f, indent=2)
+    
+    # Evaluate on test set
+    print("\n" + "="*80)
+    print("Final Evaluation on Test Set (Best Model)")
+    print("="*80)
+    
+    model.eval()
+    test_preds = []
+    test_labels = []
+    test_probs = []  # Store probabilities for ROC curves
+    
+    with torch.no_grad():
+        for batch in tqdm(test_loader, desc="Testing"):
+            density = batch['density'].to(device)
+            sequence = batch['sequence'].to(device)
+            pairing = batch['pairing'].to(device)
+            labels = batch['label'].to(device)
+            
+            logits = model(density, sequence, pairing)
+            probs = torch.softmax(logits, dim=1)
+            preds = torch.argmax(logits, dim=1)
+            
+            test_preds.extend(preds.cpu().numpy())
+            test_labels.extend(labels.cpu().numpy())
+            test_probs.extend(probs.cpu().numpy())
+    
+    test_preds = np.array(test_preds)
+    test_labels = np.array(test_labels)
+    test_probs = np.array(test_probs)
+    
+    # Compute test metrics
+    test_metrics = compute_class_metrics(test_preds, test_labels, class_names)
+    
+    # Save test predictions, probabilities, and metrics
+    np.save(save_dir / 'test_preds.npy', test_preds)
+    np.save(save_dir / 'test_labels.npy', test_labels)
+    np.save(save_dir / 'test_probs.npy', test_probs)
+    with open(save_dir / 'final_test_metrics.json', 'w') as f:
+        json.dump(test_metrics, f, indent=2)
+    
+    # Calculate test accuracy
+    test_acc = 100.0 * np.sum(test_preds == test_labels) / len(test_labels)
     
     print(f"\n✓ Training complete! Results saved to: {save_dir}")
     print(f"✓ Best validation accuracy: {trainer.best_val_acc:.2f}%")
+    print(f"✓ Final test accuracy: {test_acc:.2f}%")
 
 
 if __name__ == '__main__':

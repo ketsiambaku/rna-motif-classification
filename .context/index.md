@@ -1,9 +1,9 @@
 ---
 module-name: "RNA Motif Classification"
-version: "0.4.0"
+version: "0.5.0"
 description: "Deep learning system for classifying RNA secondary structure motif types (bulge loops, internal loops, hairpin loops) from cryo-EM density maps with size-invariant structural features"
-status: "Phase 1 Complete | Paper Sections 1-2 Complete | Phase 2 Ready"
-phase: "Feature Engineering (Size-Invariant PDB Features) + Paper Writing"
+status: "Phase 2.1 Complete | Sequence Features Implemented | Colab Training Ready"
+phase: "Training & Evaluation (Awaiting Colab Results) + Paper Methods Writing"
 related-modules:
   - name: Example Training Code
     path: ./example/TrainingForClassification
@@ -52,14 +52,27 @@ key-findings:
     significance: "Proves model CAN learn structural patterns without leakage"
   - name: "Task Selection"
     description: "3-class coarse (bulge/hairpin/internal) is realistic vs 14-class fine-grained (21.99%)"
+  - name: "6-Class Consolidation"
+    description: "Balanced grouping into small/large internal, bulge, hairpin classes"
+    implementation: "CONSOLIDATION_MAP in hybrid_dataset.py, controlled by --consolidate flag"
+    status: "Implemented and tested, training on Colab"
+  - name: "Sequence Feature Implementation"
+    description: "24 size-invariant features from RNA sequences (composition, GC%, dinucleotides, entropy)"
+    implementation: "400+ line SequenceFeatureExtractor with SEQRES parsing and modified nucleotide handling"
+    validation: "Features use percentages/ratios normalized by sequence length"
+    status: "Complete with paper documentation (Methods 5.4.1)"
+  - name: "Class Weights Bug Fix"
+    description: "get_class_weights() was hardcoded for 15 classes, causing crash with 6-class consolidation"
+    solution: "Use self.num_classes (dynamic) instead of len(CLASS_NAMES) (fixed)"
+    commit: "3173ae9 pushed to dev-consolidate branch"
   - name: "Literature Review Complete"
     description: "7 papers integrated covering RNA structure, cryo-EM, deep learning, motif analysis"
     papers: "MXfold2, DeepTracer 1.0/2.0, AlphaFold 3, DeepCryoRNA, RNAMotifComp, CaCoFold-R3D"
     impact: "Identified 5 research gaps positioning our work (cryo-EM motif classification, size-invariance, multi-modal fusion, overlapping families, local/global context)"
   - name: "Paper Progress"
-    description: "IEEE format paper Sections 1 (Introduction) and 2 (Related Work) complete"
-    content: "Problem statement with formal notation, 4 key challenges, 7 comprehensive subsections covering state-of-the-art"
-    status: "700+ lines written, ready for Methodology section after Phase 2 implementation"
+    description: "IEEE format paper Sections 1-2 complete, Methods 5.4.1 sequence features documented"
+    content: "Introduction, Related Work, and detailed sequence feature extraction with mathematical formulas"
+    status: "900+ lines written, ready for remaining Methods sections after training results"
 development:
   stack:
     - PyTorch (with MPS for Apple Silicon M1)
@@ -74,9 +87,18 @@ development:
     - "Install: pip install torch biopython mrcfile numpy pandas scikit-learn"
   current-phase:
     phase: "2.1"
-    task: "Implementing RNA sequence feature extraction"
-    timeline: "Week 5 (3-4 days)"
-    expected-result: "65-70% accuracy with density + sequence features"
+    task: "Colab Training & Results Analysis"
+    status: "Implementation complete, training on GPU"
+    timeline: "Week 5 (December 1, 2025)"
+    completed:
+      - "400+ line sequence feature extractor with 24 size-invariant features"
+      - "461+ line hybrid dataset with 6-class consolidation support"
+      - "350+ line hybrid U-Net model (3.7M parameters)"
+      - "474+ line training script with CLI args and class weight fix"
+      - "Colab notebook for T4 GPU training"
+      - "Paper Methods section 5.4.1 (sequence features documented)"
+    next: "Run full training on Colab, analyze results, validate size-invariance"
+    expected-result: "50-70% accuracy with 6-class consolidation"
 ---
 
 # RNA Motif Classification

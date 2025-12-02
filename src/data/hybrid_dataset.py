@@ -18,6 +18,7 @@ import sys
 # Add parent directory to path for importing sequence features
 sys.path.append(str(Path(__file__).parent.parent))
 from features.sequence_features import SequenceFeatureExtractor
+from features.base_pairing import BasePairingExtractor
 
 
 class HybridDataset(Dataset):
@@ -114,6 +115,9 @@ class HybridDataset(Dataset):
         
         # Initialize sequence feature extractor
         self.seq_extractor = SequenceFeatureExtractor()
+        
+        # Initialize base pairing feature extractor
+        self.pairing_extractor = BasePairingExtractor()
         
         # Load file lists
         self.samples = self._load_samples()
@@ -279,6 +283,27 @@ class HybridDataset(Dataset):
             # (warnings already printed by sequence_features.py)
             return np.zeros(24, dtype=np.float32)
     
+    def _extract_pairing_features(self, pdb_path: str) -> np.ndarray:
+        """
+        Extract ~10 size-invariant base pairing features from PDB file.
+        
+        Args:
+            pdb_path: Path to .pdb file
+            
+        Returns:
+            Feature vector of shape (10,) - returns zeros if extraction fails
+        """
+        try:
+            features = self.pairing_extractor.extract_features(pdb_path)
+            # Check if features are valid (not None and correct shape)
+            if features is None or len(features) != 10:
+                # Return zero vector as fallback
+                return np.zeros(10, dtype=np.float32)
+            return features
+        except Exception as e:
+            # Silently return zero vector for failed extractions
+            return np.zeros(10, dtype=np.float32)
+    
     def __len__(self) -> int:
         """Return number of samples in dataset."""
         return len(self.samples)
@@ -294,7 +319,8 @@ class HybridDataset(Dataset):
             Dictionary with keys:
                 - 'density': Tensor of shape (1, target_size, target_size, target_size)
                 - 'sequence': Tensor of shape (24,)
-                - 'label': Integer class label (0-14)
+                - 'pairing': Tensor of shape (10,)
+                - 'label': Integer class label (0-5 for consolidated, 0-14 for full)
                 - 'class_name': String class name (for debugging)
                 - 'mrc_path': Path to MRC file (for debugging)
         """
@@ -306,9 +332,13 @@ class HybridDataset(Dataset):
         # Extract sequence features
         sequence = self._extract_sequence_features(sample_info['pdb_path'])
         
+        # Extract base pairing features
+        pairing = self._extract_pairing_features(sample_info['pdb_path'])
+        
         # Convert to tensors
         density_tensor = torch.from_numpy(density).float().unsqueeze(0)  # Add channel dim
         sequence_tensor = torch.from_numpy(sequence).float()
+        pairing_tensor = torch.from_numpy(pairing).float()
         label_tensor = torch.tensor(sample_info['label'], dtype=torch.long)
         
         # Apply optional transform to density
@@ -318,6 +348,7 @@ class HybridDataset(Dataset):
         return {
             'density': density_tensor,
             'sequence': sequence_tensor,
+            'pairing': pairing_tensor,
             'label': label_tensor,
             'class_name': sample_info['class_name'],
             'mrc_path': sample_info['mrc_path']
