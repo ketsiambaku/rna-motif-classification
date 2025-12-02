@@ -53,6 +53,35 @@ class HybridDataset(Dataset):
         'hairpin3', 'hairpin4', 'hairpin5', 'hairpin6', 'hairpin7'  # Hairpin classes (10-14)
     ]
     
+    # Class consolidation mapping (15 classes -> 6 superclasses)
+    # Balanced grouping based on sample counts for better class distribution
+    CONSOLIDATION_MAP = {
+        '1x1': 'small_internal',
+        '2x2': 'small_internal',
+        '3x3': 'large_internal',
+        '4x4': 'large_internal',
+        '5x5': 'large_internal',
+        'bulge1': 'small_bulge',
+        'bulge2': 'small_bulge',
+        'bulge3': 'large_bulge',
+        'bulge4': 'large_bulge',
+        'bulge5': 'large_bulge',
+        'hairpin3': 'small_hairpin',
+        'hairpin4': 'small_hairpin',
+        'hairpin5': 'small_hairpin',
+        'hairpin6': 'large_hairpin',
+        'hairpin7': 'large_hairpin'
+    }
+    
+    CONSOLIDATED_CLASS_NAMES = [
+        'small_internal',    # 1x1, 2x2          → ~7,047 samples
+        'large_internal',    # 3x3, 4x4, 5x5     → ~2,782 samples
+        'small_bulge',       # bulge1, bulge2    → ~9,073 samples
+        'large_bulge',       # bulge3, bulge4, bulge5 → ~2,447 samples
+        'small_hairpin',     # hairpin3, hairpin4, hairpin5 → ~4,584 samples
+        'large_hairpin'      # hairpin6, hairpin7 → ~2,805 samples
+    ]
+    
     def __init__(
         self,
         root_dir: str,
@@ -60,7 +89,8 @@ class HybridDataset(Dataset):
         transform: Optional[callable] = None,
         target_size: int = 32,
         use_subset: float = 0.1,
-        random_seed: int = 42
+        random_seed: int = 42,
+        consolidate: bool = False
     ):
         """Initialize the hybrid dataset."""
         assert split in ['train', 'val', 'test'], f"split must be 'train', 'val', or 'test', got {split}"
@@ -72,6 +102,15 @@ class HybridDataset(Dataset):
         self.target_size = target_size
         self.use_subset = use_subset
         self.random_seed = random_seed
+        self.consolidate = consolidate
+        
+        # Set up class system
+        if self.consolidate:
+            self.num_classes = len(self.CONSOLIDATED_CLASS_NAMES)
+            self.class_to_idx = {name: idx for idx, name in enumerate(self.CONSOLIDATED_CLASS_NAMES)}
+        else:
+            self.num_classes = len(self.CLASS_NAMES)
+            self.class_to_idx = {name: idx for idx, name in enumerate(self.CLASS_NAMES)}
         
         # Initialize sequence feature extractor
         self.seq_extractor = SequenceFeatureExtractor()
@@ -79,8 +118,14 @@ class HybridDataset(Dataset):
         # Load file lists
         self.samples = self._load_samples()
         
-        print(f"Loaded {len(self.samples)} samples for {split} split (subset={use_subset:.1%})")
+        mode_str = "6-class consolidated" if self.consolidate else "15-class"
+        print(f"Loaded {len(self.samples)} samples for {split} split ({mode_str}, subset={use_subset:.1%})")
         self._print_class_distribution()
+    
+    def _get_consolidated_label(self, class_name: str) -> int:
+        """Get consolidated class label from original class name."""
+        consolidated_name = self.CONSOLIDATION_MAP[class_name]
+        return self.class_to_idx[consolidated_name]
     
     def _load_samples(self) -> List[Dict[str, any]]:
         """
@@ -107,11 +152,15 @@ class HybridDataset(Dataset):
                 pdb_path = mrc_path.with_suffix('.pdb')
                 
                 if pdb_path.exists():
+                    # Determine the label to use
+                    label = self._get_consolidated_label(class_name) if self.consolidate else class_idx
+                    
                     all_samples.append({
                         'mrc_path': str(mrc_path),
                         'pdb_path': str(pdb_path),
-                        'label': class_idx,
-                        'class_name': class_name
+                        'label': label,
+                        'class_name': class_name,
+                        'original_label': class_idx
                     })
         
         if len(all_samples) == 0:
@@ -139,17 +188,25 @@ class HybridDataset(Dataset):
             return all_samples[n_train+n_val:]
     
     def _print_class_distribution(self):
-        """Print class distribution in current split."""
-        class_counts = {}
-        for sample in self.samples:
-            class_name = sample['class_name']
-            class_counts[class_name] = class_counts.get(class_name, 0) + 1
+        """Print the distribution of classes in this split."""
+        from collections import Counter
         
-        print(f"\n{self.split.upper()} split class distribution:")
-        for class_name in self.CLASS_NAMES:
-            count = class_counts.get(class_name, 0)
-            if count > 0:
-                print(f"  {class_name:>10}: {count:>4} samples")
+        if self.consolidate:
+            # Show consolidated class distribution
+            label_counts = Counter([s['label'] for s in self.samples])
+            print(f"\n{self.split.upper()} split class distribution (6 consolidated classes):")
+            for class_name, class_idx in sorted(self.class_to_idx.items(), key=lambda x: x[1]):
+                count = label_counts.get(class_idx, 0)
+                if count > 0:
+                    print(f"  {class_name:>18}: {count:>5} samples")
+        else:
+            # Show original 15 class distribution
+            class_counts = Counter([s['class_name'] for s in self.samples])
+            print(f"\n{self.split.upper()} split class distribution (15 classes):")
+            for class_name in self.CLASS_NAMES:
+                count = class_counts.get(class_name, 0)
+                if count > 0:
+                    print(f"  {class_name:>10}: {count:>4} samples")
     
     def _load_mrc(self, mrc_path: str) -> np.ndarray:
         """

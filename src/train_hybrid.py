@@ -9,6 +9,7 @@ import os
 import sys
 import time
 import json
+import argparse
 from pathlib import Path
 from datetime import datetime
 import numpy as np
@@ -297,18 +298,39 @@ def compute_class_metrics(preds, labels, class_names):
 
 def main():
     """Main training function."""
+    # Parse command-line arguments
+    parser = argparse.ArgumentParser(description='Train Hybrid U-Net for RNA motif classification')
+    parser.add_argument('--batch-size', type=int, default=8, help='Batch size for training')
+    parser.add_argument('--use-subset', type=float, default=0.1, help='Fraction of dataset to use (0.0-1.0)')
+    parser.add_argument('--device', type=str, default='auto', help='Device to use (cuda/mps/cpu/auto)')
+    parser.add_argument('--num-workers', type=int, default=0, help='Number of data loading workers')
+    parser.add_argument('--consolidate', action='store_true', help='Use 6-class consolidation instead of 15 classes')
+    args = parser.parse_args()
+    
+    # Determine device
+    if args.device == 'auto':
+        if torch.cuda.is_available():
+            device_str = 'cuda'
+        elif torch.backends.mps.is_available():
+            device_str = 'mps'
+        else:
+            device_str = 'cpu'
+    else:
+        device_str = args.device
+    
     # Configuration
     config = {
         'dataset_root': 'dataset2',
-        'batch_size': 8,
-        'num_workers': 0,  # Use 0 for M1 Mac compatibility
+        'batch_size': args.batch_size,
+        'num_workers': args.num_workers,
         'n_epochs': 50,
         'learning_rate': 0.001,
         'weight_decay': 1e-4,
         'early_stopping_patience': 10,
-        'use_subset': 0.1,  # 10% subset for Phase 2.1
+        'use_subset': args.use_subset,
         'random_seed': 42,
-        'device': 'mps' if torch.backends.mps.is_available() else 'cpu'
+        'device': device_str,
+        'consolidate': args.consolidate
     }
     
     # Set random seeds
@@ -317,7 +339,8 @@ def main():
     
     # Create save directory with timestamp
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-    save_dir = Path('experiments') / f'hybrid_phase2_1_{timestamp}'
+    mode_suffix = '_6class' if config['consolidate'] else '_15class'
+    save_dir = Path('experiments') / f'hybrid_phase2_1{mode_suffix}_{timestamp}'
     save_dir.mkdir(parents=True, exist_ok=True)
     
     # Save config
@@ -340,14 +363,16 @@ def main():
         root_dir=config['dataset_root'],
         split='train',
         use_subset=config['use_subset'],
-        random_seed=config['random_seed']
+        random_seed=config['random_seed'],
+        consolidate=config['consolidate']
     )
     
     val_dataset = HybridDataset(
         root_dir=config['dataset_root'],
         split='val',
         use_subset=config['use_subset'],
-        random_seed=config['random_seed']
+        random_seed=config['random_seed'],
+        consolidate=config['consolidate']
     )
     
     # Create data loaders
@@ -375,7 +400,8 @@ def main():
     print("="*80)
     
     device = torch.device(config['device'])
-    model = HybridUNet(n_classes=15).to(device)
+    n_classes = 6 if config['consolidate'] else 15
+    model = HybridUNet(n_classes=n_classes).to(device)
     
     total_params = sum(p.numel() for p in model.parameters())
     trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
@@ -432,7 +458,8 @@ def main():
     val_labels = np.load(save_dir / 'best_val_labels.npy')
     
     # Compute detailed metrics
-    metrics = compute_class_metrics(val_preds, val_labels, train_dataset.CLASS_NAMES)
+    class_names = train_dataset.CONSOLIDATED_CLASS_NAMES if config['consolidate'] else train_dataset.CLASS_NAMES
+    metrics = compute_class_metrics(val_preds, val_labels, class_names)
     
     # Save metrics
     with open(save_dir / 'final_metrics.json', 'w') as f:

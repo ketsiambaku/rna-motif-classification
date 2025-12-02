@@ -1,102 +1,151 @@
-# Google Colab Training Guide for RNA Motif Classification
+# Google Colab Training Guide - 6-Class Consolidation
 
-## Setup Steps
+This guide shows how to train the RNA motif classification model on Google Colab with GPU acceleration using **6-class consolidation** for better performance.
 
-### 1. Create New Colab Notebook
-Go to: https://colab.research.google.com/
+## What's New: 6-Class Consolidation
 
-### 2. Enable GPU
-- Runtime → Change runtime type → Hardware accelerator → **T4 GPU** (or A100 if available)
+We consolidated 15 fine-grained classes into 6 superclasses for better accuracy:
 
-### 3. Install Dependencies
+| Consolidated Class | Original Classes | Samples | Biological Meaning |
+|-------------------|------------------|---------|-------------------|
+| `small_internal` | 1x1, 2x2 | 7,047 | Small internal loops |
+| `large_internal` | 3x3, 4x4, 5x5 | 2,782 | Large internal loops |
+| `small_bulge` | bulge1, bulge2 | 9,073 | Small bulge loops |
+| `large_bulge` | bulge3-5 | 2,447 | Large bulge loops |
+| `small_hairpin` | hairpin3-5 | 4,584 | Small hairpin loops |
+| `large_hairpin` | hairpin6-7 | 2,805 | Large hairpin loops |
+
+**Expected Performance:**
+- **6 classes**: 50-65% accuracy (achievable!)
+- **15 classes**: 25-35% accuracy (for comparison)
+
+---
+
+## Quick Start
+
+### 1. Open Colab & Enable GPU
+- Go to [colab.research.google.com](https://colab.research.google.com)
+- Upload `colab_training.ipynb` (provided below)
+- **Runtime → Change runtime type → GPU (T4)**
+
+### 2. Run All Cells in Notebook
+The notebook will automatically:
+- Mount Google Drive
+- Clone your GitHub repo (dev branch)
+- Extract dataset
+- Install dependencies
+- Train model with 6-class consolidation
+
+### 3. Monitor Training
+- Training takes ~15-20 minutes on T4 GPU
+- Best model saved automatically
+- Results in `experiments/` folder
+
+---
+
+## Manual Setup Steps
+
+### Step 1: Mount Drive & Check GPU
 ```python
-!pip install -q mrcfile biopython scikit-learn tqdm
+from google.colab import drive
+import torch
+
+drive.mount('/content/drive')
+
+if torch.cuda.is_available():
+    gpu_name = torch.cuda.get_device_name(0)
+    gpu_memory = torch.cuda.get_device_properties(0).total_memory / 1024**3
+    print(f"✓ GPU detected: {gpu_name} ({gpu_memory:.1f} GB)")
+else:
+    print("⚠ No GPU! Change runtime type to GPU")
 ```
 
-### 4. Upload Required Files
-
-**Option A: Upload directly to Colab**
-```python
-from google.colab import files
-import os
-
-# Create directory structure
-os.makedirs("src/data", exist_ok=True)
-os.makedirs("src/features", exist_ok=True)
-os.makedirs("src/models", exist_ok=True)
-os.makedirs("experiments", exist_ok=True)
-
-# Upload files one by one
-print("Upload hybrid_dataset.py")
-uploaded = files.upload()  # Upload src/data/hybrid_dataset.py
-!mv hybrid_dataset.py src/data/
-
-print("Upload sequence_features.py")
-uploaded = files.upload()  # Upload src/features/sequence_features.py
-!mv sequence_features.py src/features/
-
-print("Upload hybrid_unet.py")
-uploaded = files.upload()  # Upload src/models/hybrid_unet.py
-!mv hybrid_unet.py src/models/
-
-print("Upload train_hybrid.py")
-uploaded = files.upload()  # Upload train_hybrid.py
-```
-
-**Option B: Clone from GitHub (recommended)**
+### Step 2: Clone Repository
 ```python
 !git clone https://github.com/ketsiambaku/rna-motif-classification.git
 %cd rna-motif-classification
 !git checkout dev
 ```
 
-### 5. Upload Dataset
-
-**Option A: Upload compressed dataset**
+### Step 3: Extract Dataset
 ```python
-from google.colab import files
-print("Upload dataset2.zip")
-uploaded = files.upload()
-!unzip -q dataset2.zip
+import os
+import tarfile
+
+dataset_path = '/content/drive/MyDrive/dataset2.tar.gz'
+
+if os.path.exists(dataset_path):
+    print("Extracting dataset...")
+    with tarfile.open(dataset_path, 'r:gz') as tar:
+        tar.extractall('.')
+    print("✓ Dataset extracted")
+else:
+    print(f"⚠ Dataset not found at: {dataset_path}")
 ```
 
-**Option B: Mount Google Drive (recommended for large datasets)**
+### Step 4: Install Dependencies
 ```python
-from google.colab import drive
-drive.mount('/content/drive')
-
-# If dataset is in Google Drive
-!ln -s /content/drive/MyDrive/dataset2 dataset2
+!pip install -q mrcfile biopython scikit-learn
 ```
 
-### 6. Start Training
+### Step 5: Train with 6-Class Consolidation
 ```python
-!python train_hybrid.py \
-    --dataset-root dataset2 \
-    --batch-size 32 \
-    --epochs 50 \
-    --use-subset 1.0 \
-    --device cuda
+import subprocess
+import sys
+
+cmd = [
+    sys.executable, 'src/train_hybrid.py',
+    '--consolidate',
+    '--use-subset', '1.0',
+    '--batch-size', '32',
+    '--device', 'cuda',
+    '--num-workers', '2'
+]
+
+print("Starting training with 6-class consolidation...")
+process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
+for line in process.stdout:
+    print(line, end='')
+process.wait()
 ```
 
-## Expected Performance
+---
 
-- **MPS (M1/M2 Mac)**: ~2.1 it/s, ~2 minutes/epoch, **~20 hours total**
-- **Colab T4 GPU**: ~15-20 it/s, ~15-20 seconds/epoch, **~15-20 minutes total**
-- **Colab A100 GPU**: ~50+ it/s, ~5 seconds/epoch, **~5 minutes total**
+## Training Options
 
-## Training Configuration Options
-
+### Option 1: 6-Class Consolidation (RECOMMENDED)
 ```bash
-# Full dataset, larger batch size (T4 GPU has 16GB)
-!python train_hybrid.py --dataset-root dataset2 --batch-size 32 --use-subset 1.0
-
-# Quick test run (10% data)
-!python train_hybrid.py --dataset-root dataset2 --batch-size 16 --use-subset 0.1
-
-# With specific learning rate
-!python train_hybrid.py --dataset-root dataset2 --batch-size 32 --lr 0.0005
+python src/train_hybrid.py --consolidate --use-subset 1.0 --batch-size 32 --device cuda
 ```
+- Expected: 50-65% accuracy
+- Time: ~15-20 min on T4
+
+### Option 2: 15-Class Original (for comparison)
+```bash
+python src/train_hybrid.py --use-subset 1.0 --batch-size 32 --device cuda
+```
+- Expected: 25-35% accuracy
+- Time: ~15-20 min on T4
+
+### Option 3: Quick Test
+```bash
+python src/train_hybrid.py --consolidate --use-subset 0.1 --batch-size 32
+```
+- Time: ~2-3 min (10% subset)
+
+---
+
+## Troubleshooting
+
+**No GPU?** Runtime → Change runtime type → GPU (T4)
+
+**Dataset not found?** Upload `dataset2.tar.gz` to Google Drive root
+
+**Out of memory?** Use `--batch-size 16`
+
+**ModuleNotFoundError?** Run: `!pip install -q mrcfile biopython scikit-learn --upgrade`
+
+Good luck with training! 🚀
 
 ## Download Results
 
