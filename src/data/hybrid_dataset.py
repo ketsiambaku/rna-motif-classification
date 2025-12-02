@@ -11,6 +11,7 @@ from typing import Optional, Tuple, List, Dict
 import numpy as np
 import mrcfile
 import torch
+import torch.nn.functional as F
 from torch.utils.data import Dataset
 import sys
 
@@ -152,7 +153,12 @@ class HybridDataset(Dataset):
     
     def _load_mrc(self, mrc_path: str) -> np.ndarray:
         """
-        Load MRC density file and process to target size.
+        Load MRC density file and resize to target size using trilinear interpolation.
+        
+        This matches the approach used in the example code:
+        - Min-max normalization to [0, 1]
+        - Trilinear interpolation for smooth resizing
+        - Preserves all structural information without cropping/padding artifacts
         
         Args:
             mrc_path: Path to .mrc file
@@ -161,72 +167,38 @@ class HybridDataset(Dataset):
             Density volume of shape (target_size, target_size, target_size)
         """
         with mrcfile.open(mrc_path, mode='r', permissive=True) as mrc:
-            density = mrc.data.copy()
+            density = mrc.data.astype(np.float32)
         
         # Handle different input shapes
         if density.ndim != 3:
             raise ValueError(f"Expected 3D density, got shape {density.shape}")
         
-        # Resize to target size using interpolation or cropping/padding
-        density = self._resize_density(density, self.target_size)
+        # Min-max normalization to [0, 1]
+        density_min = density.min()
+        density_max = density.max()
+        if density_max > density_min:
+            density = (density - density_min) / (density_max - density_min + 1e-8)
+        else:
+            density = np.zeros_like(density)
         
-        # Normalize (z-score normalization)
-        mean = density.mean()
-        std = density.std()
-        if std > 0:
-            density = (density - mean) / std
+        # Convert to PyTorch tensor and add batch + channel dimensions
+        density_tensor = torch.tensor(density).unsqueeze(0).unsqueeze(0)  # [1, 1, D, H, W]
+        
+        # Resize using trilinear interpolation
+        target_shape = (self.target_size, self.target_size, self.target_size)
+        density_tensor = F.interpolate(
+            density_tensor,
+            size=target_shape,
+            mode='trilinear',
+            align_corners=False
+        )
+        
+        # Convert back to numpy and remove batch/channel dimensions
+        density = density_tensor.squeeze(0).squeeze(0).numpy()  # [D, H, W]
         
         return density
     
-    def _resize_density(self, density: np.ndarray, target_size: int) -> np.ndarray:
-        """
-        Resize density to target size via center cropping or padding.
-        
-        For simplicity, we use center crop if larger, center pad if smaller.
-        For more sophisticated resizing, consider scipy.ndimage.zoom.
-        
-        Args:
-            density: Input density of shape (H, W, D)
-            target_size: Target size for all dimensions
-            
-        Returns:
-            Resized density of shape (target_size, target_size, target_size)
-        """
-        h, w, d = density.shape
-        
-        # Initialize output
-        output = np.zeros((target_size, target_size, target_size), dtype=density.dtype)
-        
-        # Calculate center crop/pad for each dimension
-        for dim_idx, (current_size, target) in enumerate([(h, target_size), (w, target_size), (d, target_size)]):
-            if current_size > target:
-                # Will crop
-                pass
-            elif current_size < target:
-                # Will pad
-                pass
-        
-        # Center crop or pad
-        h_start = max(0, (h - target_size) // 2)
-        w_start = max(0, (w - target_size) // 2)
-        d_start = max(0, (d - target_size) // 2)
-        
-        h_end = min(h, h_start + target_size)
-        w_end = min(w, w_start + target_size)
-        d_end = min(d, d_start + target_size)
-        
-        out_h_start = max(0, (target_size - h) // 2)
-        out_w_start = max(0, (target_size - w) // 2)
-        out_d_start = max(0, (target_size - d) // 2)
-        
-        out_h_end = out_h_start + (h_end - h_start)
-        out_w_end = out_w_start + (w_end - w_start)
-        out_d_end = out_d_start + (d_end - d_start)
-        
-        output[out_h_start:out_h_end, out_w_start:out_w_end, out_d_start:out_d_end] = \
-            density[h_start:h_end, w_start:w_end, d_start:d_end]
-        
-        return output
+
     
     def _extract_sequence_features(self, pdb_path: str) -> np.ndarray:
         """
