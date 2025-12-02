@@ -332,7 +332,7 @@ class HybridDataset(Dataset):
         Returns:
             Tensor of shape (n_classes,) with class weights
         """
-        class_counts = np.zeros(len(self.CLASS_NAMES), dtype=np.int64)
+        class_counts = np.zeros(self.num_classes, dtype=np.int64)
         
         for sample in self.samples:
             class_counts[sample['label']] += 1
@@ -342,8 +342,7 @@ class HybridDataset(Dataset):
         
         # Inverse frequency weighting
         n_samples = len(self.samples)
-        n_classes = len(self.CLASS_NAMES)
-        weights = n_samples / (n_classes * class_counts)
+        weights = n_samples / (self.num_classes * class_counts)
         
         return torch.from_numpy(weights).float()
 
