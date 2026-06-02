@@ -160,38 +160,19 @@ rsync -az --progress \
     "$HOST:$RDIR/data/"
 ok "Data synced"
 
-# ── Step 6: Launch training ───────────────────────────────────────────────────
-if _ssh "tmux has-session -t '$SESSION'" 2>/dev/null; then
-    warn "tmux session '$SESSION' is already running — skipping launch"
-    warn "To restart: ssh $HOST → tmux kill-session -t $SESSION → rerun deploy.sh $1"
-else
-    info "Launching training in tmux session '$SESSION'..."
-    _ssh "bash -s" <<REMOTE
+# ── Step 6: Run training in the foreground ───────────────────────────────────
+# Output streams directly to your terminal. Ctrl+C to stop.
+# Log is also saved to checkpoints/$MODEL/train.log on the server.
+info "Starting training — output appears below (Ctrl+C to stop):"
+echo "────────────────────────────────────────────"
+_ssh "bash -s" <<REMOTE
 set -e
 cd $RDIR
 mkdir -p checkpoints/$MODEL
-
-# Use python3 if available, fall back to python
 PYTHON=\$(command -v python3 || command -v python)
-
-tmux new-session -d -s "$SESSION" \
-    "\$PYTHON scripts/run_training.py --model $MODEL 2>&1 | tee checkpoints/$MODEL/train.log; echo '=== Done ==='"
-echo "  Session started"
+\$PYTHON scripts/run_training.py --model $MODEL 2>&1 | tee checkpoints/$MODEL/train.log
 REMOTE
-    ok "Training running in tmux session '$SESSION'"
-fi
-
-# ── Done ──────────────────────────────────────────────────────────────────────
-echo
-echo -e "${BOLD}${GREEN}  ✓ $SERVER is set up and training.${NC}"
-echo
-echo -e "  Monitor (run these separately):"
-echo -e "    ssh $HOST"
-echo -e "    tmux attach -t $SESSION"
-echo
-echo -e "  Or tail the log directly:"
-echo -e "    ssh $HOST 'tail -f $RDIR/checkpoints/$MODEL/train.log'"
-echo
-echo -e "  Retrieve checkpoint when done:"
+echo "────────────────────────────────────────────"
+echo -e "${BOLD}${GREEN}  ✓ Training finished on $SERVER${NC}"
+echo -e "  Retrieve checkpoint:"
 echo -e "    scp $HOST:$RDIR/checkpoints/$MODEL/best.pt ./checkpoints/"
-echo

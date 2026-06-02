@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 PyTorch Dataset for RNA motif classification from cryo-EM density volumes.
 

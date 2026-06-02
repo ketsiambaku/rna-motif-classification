@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 Label hierarchy for RNA motif classification.
 

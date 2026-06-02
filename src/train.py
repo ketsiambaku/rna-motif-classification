@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 Generic training loop for RNA motif classification models.
 

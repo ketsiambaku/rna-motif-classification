@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 M2 — 3D ResNet-18 with Hierarchical Multi-Head Loss
 

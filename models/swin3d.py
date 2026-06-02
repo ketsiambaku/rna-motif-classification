@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 M3 — 3D Swin Transformer with Conditional Hierarchical Inference
 
