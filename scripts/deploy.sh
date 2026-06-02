@@ -170,8 +170,12 @@ else
 set -e
 cd $RDIR
 mkdir -p checkpoints/$MODEL
+
+# Use python3 if available, fall back to python
+PYTHON=\$(command -v python3 || command -v python)
+
 tmux new-session -d -s "$SESSION" \
-    "python scripts/run_training.py --model $MODEL 2>&1 | tee checkpoints/$MODEL/train.log; echo '=== Done ==='"
+    "\$PYTHON scripts/run_training.py --model $MODEL 2>&1 | tee checkpoints/$MODEL/train.log; echo '=== Done ==='"
 echo "  Session started"
 REMOTE
     ok "Training running in tmux session '$SESSION'"
@@ -181,7 +185,13 @@ fi
 echo
 echo -e "${BOLD}${GREEN}  ✓ $SERVER is set up and training.${NC}"
 echo
-echo -e "  Attach to training  :  ssh $HOST  →  tmux attach -t $SESSION"
-echo -e "  Watch log           :  ssh $HOST 'tail -f $RDIR/checkpoints/$MODEL/train.log'"
-echo -e "  Retrieve checkpoint :  scp $HOST:$RDIR/checkpoints/$MODEL/best.pt ./checkpoints/"
+echo -e "  Monitor (run these separately):"
+echo -e "    ssh $HOST"
+echo -e "    tmux attach -t $SESSION"
+echo
+echo -e "  Or tail the log directly:"
+echo -e "    ssh $HOST 'tail -f $RDIR/checkpoints/$MODEL/train.log'"
+echo
+echo -e "  Retrieve checkpoint when done:"
+echo -e "    scp $HOST:$RDIR/checkpoints/$MODEL/best.pt ./checkpoints/"
 echo
