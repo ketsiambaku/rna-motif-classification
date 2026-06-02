@@ -88,6 +88,12 @@ class RNAMotifDataset(Dataset):
         with mrcfile.open(path, permissive=True) as mrc:
             data = mrc.data.astype(np.float32)
 
+        # Guard against malformed MRC files that are not 3D volumes.
+        # Return a zero tensor so the DataLoader worker doesn't crash —
+        # these samples contribute a neutral (zero) signal to training.
+        if data.ndim != 3:
+            return torch.zeros(1, *self.target_size)
+
         data = _normalize_95p(data)
 
         # [1, D, H, W]
