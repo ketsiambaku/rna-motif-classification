@@ -160,19 +160,32 @@ rsync -az --progress \
     "$HOST:$RDIR/data/"
 ok "Data synced"
 
-# ── Step 6: Run training in the foreground ───────────────────────────────────
-# Output streams directly to your terminal. Ctrl+C to stop.
-# Log is also saved to checkpoints/$MODEL/train.log on the server.
-info "Starting training — output appears below (Ctrl+C to stop):"
-echo "────────────────────────────────────────────"
+# ── Step 6: Launch in tmux then attach ───────────────────────────────────────
+# tmux keeps training alive if your SSH connection drops.
+# You see output live by attaching. Disconnect safely with Ctrl+B then D.
+# Reconnect any time with: ssh $HOST then tmux attach -t $SESSION
+
+# Kill any stale session from a previous run
+_ssh "tmux kill-session -t '$SESSION' 2>/dev/null; true"
+
+info "Launching training in tmux session '$SESSION'..."
 _ssh "bash -s" <<REMOTE
 set -e
 cd $RDIR
 mkdir -p checkpoints/$MODEL
 PYTHON=\$(command -v python3 || command -v python)
-\$PYTHON scripts/run_training.py --model $MODEL 2>&1 | tee checkpoints/$MODEL/train.log
+tmux new-session -d -s "$SESSION" \
+    "\$PYTHON scripts/run_training.py --model $MODEL 2>&1 | tee checkpoints/$MODEL/train.log; echo '=== Training finished ==='"
 REMOTE
+ok "Training started in tmux session '$SESSION'"
+echo
+echo -e "  ${YELLOW}Attaching to training output — disconnect safely with Ctrl+B then D${NC}"
+echo -e "  ${YELLOW}Reconnect later: ssh $HOST → tmux attach -t $SESSION${NC}"
 echo "────────────────────────────────────────────"
-echo -e "${BOLD}${GREEN}  ✓ Training finished on $SERVER${NC}"
-echo -e "  Retrieve checkpoint:"
-echo -e "    scp $HOST:$RDIR/checkpoints/$MODEL/best.pt ./checkpoints/"
+# -t allocates a pseudo-TTY so tmux renders correctly
+ssh -t -o ControlMaster=no -o "ControlPath=$CTRL" "$HOST" "tmux attach -t '$SESSION'"
+echo "────────────────────────────────────────────"
+echo -e "${BOLD}${GREEN}  Detached. Training continues on $SERVER.${NC}"
+echo -e "  Reattach : ssh $HOST → tmux attach -t $SESSION"
+echo -e "  Log      : ssh $HOST 'tail -f $RDIR/checkpoints/$MODEL/train.log'"
+echo -e "  Retrieve : scp $HOST:$RDIR/checkpoints/$MODEL/best.pt ./checkpoints/"
