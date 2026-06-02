@@ -81,6 +81,8 @@ ok "Branch '$BRANCH' pushed"
 
 # ── Step 2: SSH into server (one password prompt — socket reused after) ───────
 CTRL="/tmp/ssh_ctrl_${SERVER}"
+# Remove stale socket from a previous run so ControlMaster starts clean
+ssh -O exit -o "ControlPath=$CTRL" "$HOST" 2>/dev/null || true
 info "Connecting to $HOST — enter your password once:"
 ssh \
     -o ControlMaster=yes \
@@ -152,7 +154,7 @@ ok "Dependencies ready"
 
 # ── Step 5: Sync data/ ────────────────────────────────────────────────────────
 info "Syncing data/ (~12 GB first run, fast on re-runs)..."
-rsync -az --info=progress2 \
+rsync -az --progress \
     -e "ssh -o ControlMaster=no -o ControlPath=$CTRL" \
     "$LOCAL_DATA/" \
     "$HOST:$RDIR/data/"
