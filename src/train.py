@@ -221,15 +221,17 @@ def _make_loaders(cfg: TrainConfig) -> tuple[DataLoader, DataLoader]:
         train_ds,
         batch_size=cfg.batch_size,
         sampler=sampler,
-        num_workers=4,
+        num_workers=8,
         pin_memory=(cfg.device != "cpu"),
+        persistent_workers=True,
     )
     val_loader = DataLoader(
         val_ds,
         batch_size=cfg.batch_size,
         shuffle=False,
-        num_workers=4,
+        num_workers=8,
         pin_memory=(cfg.device != "cpu"),
+        persistent_workers=True,
     )
     return train_loader, val_loader
 
