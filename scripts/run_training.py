@@ -69,6 +69,18 @@ def main() -> None:
     # ── Train ─────────────────────────────────────────────────────────────
     train(model, cfg)
 
+    # ── Evaluate on test set (runs automatically after training) ──────────
+    print("\n" + "=" * 60)
+    print("  Running test-set evaluation...")
+    print("=" * 60)
+    from src.evaluate import evaluate
+    evaluate(
+        model,
+        split="test",
+        device=cfg.device,
+        batch_size=cfg.batch_size * 2,
+    )
+
 
 if __name__ == "__main__":
     main()

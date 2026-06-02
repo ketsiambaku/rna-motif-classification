@@ -29,6 +29,7 @@ from sklearn.metrics import (
     confusion_matrix,
     f1_score,
     classification_report,
+    roc_auc_score,
 )
 from torch.utils.data import DataLoader
 from tqdm import tqdm
@@ -68,9 +69,9 @@ def _collect_predictions(
     l2_map = torch.tensor(CLASS_IDX_TO_L2_IDX, dtype=torch.long)
 
     out: dict[str, list] = {k: [] for k in
-                            ["true_l1", "pred_l1",
-                             "true_l2", "pred_l2",
-                             "true_l3", "pred_l3",
+                            ["true_l1", "pred_l1", "prob_l1",
+                             "true_l2", "pred_l2", "prob_l2",
+                             "true_l3", "pred_l3", "prob_l3",
                              "true_cls", "pred_cls"]}
 
     model.eval()
@@ -79,26 +80,40 @@ def _collect_predictions(
             batch["volume"] = batch["volume"].to(device)
             output = model(batch["volume"])
 
+            import torch.nn.functional as F
             if isinstance(output, dict):
-                pred_l1  = output["l1"].argmax(1).cpu()
-                pred_l2  = output["l2"].argmax(1).cpu()
-                pred_l3  = output["l3"].argmax(1).cpu()
-                pred_cls = pred_l3  # best proxy for flat class
+                prob_l1  = F.softmax(output["l1"], dim=1).cpu()
+                prob_l2  = F.softmax(output["l2"], dim=1).cpu()
+                prob_l3  = F.softmax(output["l3"], dim=1).cpu()
+                pred_l1  = prob_l1.argmax(1)
+                pred_l2  = prob_l2.argmax(1)
+                pred_l3  = prob_l3.argmax(1)
+                pred_cls = pred_l3
             else:
-                pred_cls = output.argmax(1).cpu()
+                prob_cls = F.softmax(output, dim=1).cpu()
+                pred_cls = prob_cls.argmax(1)
                 pred_l1  = l1_map[pred_cls]
                 pred_l2  = l2_map[pred_cls]
-                pred_l3  = pred_cls  # class_idx == l3_idx for L3-eligible
+                pred_l3  = pred_cls
+                # Proxy L1/L2 probs: sum softmax over classes belonging to each group
+                prob_l1  = torch.zeros(pred_cls.size(0), 3)
+                prob_l2  = torch.zeros(pred_cls.size(0), 4)
+                for ci in range(25):
+                    prob_l1[:, CLASS_IDX_TO_L1_IDX[ci]] += prob_cls[:, ci]
+                    prob_l2[:, CLASS_IDX_TO_L2_IDX[ci]] += prob_cls[:, ci]
+                prob_l3  = prob_cls[:, :15]  # class_idx 0-14 == l3_idx 0-14
 
-            true_l1 = batch["l1_idx"]
-            true_l2 = batch["l2_idx"]
-            true_l3 = batch["l3_idx"]
+            true_l1  = batch["l1_idx"]
+            true_l2  = batch["l2_idx"]
+            true_l3  = batch["l3_idx"]
             true_cls = batch["class_idx"] if "class_idx" in batch else true_l3
 
             out["true_l1"].extend(true_l1.tolist())
             out["pred_l1"].extend(pred_l1.tolist())
+            out["prob_l1"].extend(prob_l1.tolist())
             out["true_l2"].extend(true_l2.tolist())
             out["pred_l2"].extend(pred_l2.tolist())
+            out["prob_l2"].extend(prob_l2.tolist())
             out["true_cls"].extend(true_cls.tolist())
             out["pred_cls"].extend(pred_cls.tolist())
 
@@ -107,6 +122,7 @@ def _collect_predictions(
             if mask.any():
                 out["true_l3"].extend(true_l3[mask].tolist())
                 out["pred_l3"].extend(pred_l3[mask].tolist())
+                out["prob_l3"].extend(prob_l3[mask].tolist())
 
     return out
 
@@ -120,24 +136,58 @@ def _level_metrics(
     y_pred: list[int],
     class_names: list[str],
 ) -> dict:
-    """Compute accuracy, macro-F1, and per-class sensitivity for one level."""
-    acc    = accuracy_score(y_true, y_pred)
-    macro  = f1_score(y_true, y_pred, average="macro", zero_division=0)
-    report = classification_report(
-        y_true, y_pred,
-        labels=list(range(len(class_names))),
-        target_names=class_names,
-        output_dict=True,
-        zero_division=0,
+    """Compute all classification metrics for one hierarchy level.
+
+    Returns accuracy, macro-F1, macro-sensitivity, macro-specificity,
+    macro-AUC (one-vs-rest), and per-class sensitivity.
+    Matches the metric set reported in the proposal baseline table.
+    """
+    import numpy as np
+    n = len(class_names)
+    labels = list(range(n))
+
+    acc        = accuracy_score(y_true, y_pred)
+    macro_f1   = f1_score(y_true, y_pred, average="macro", zero_division=0)
+    report     = classification_report(
+        y_true, y_pred, labels=labels,
+        target_names=class_names, output_dict=True, zero_division=0,
     )
+
     per_class_sensitivity = {
         cls: round(report[cls]["recall"], 4)
-        for cls in class_names
-        if cls in report
+        for cls in class_names if cls in report
     }
+
+    # Macro sensitivity = mean of per-class recall
+    macro_sensitivity = round(
+        float(np.mean([report[c]["recall"] for c in class_names if c in report])), 4
+    )
+
+    # Macro specificity: for each class c, specificity = TN / (TN + FP)
+    # Computed from the confusion matrix
+    cm = confusion_matrix(y_true, y_pred, labels=labels)
+    specificities = []
+    for i in range(n):
+        tp = cm[i, i]
+        fn = cm[i, :].sum() - tp
+        fp = cm[:, i].sum() - tp
+        tn = cm.sum() - tp - fn - fp
+        denom = tn + fp
+        specificities.append(tn / denom if denom > 0 else 0.0)
+    macro_specificity = round(float(np.mean(specificities)), 4)
+
+    # Macro AUC (one-vs-rest) — needs probability scores, approximated here
+    # using a one-hot encoding of hard predictions as a proxy.
+    # True AUC requires model output probabilities — computed in evaluate()
+    # where logits are available; this fallback is for the confusion-only path.
+    macro_auc = None  # filled in by evaluate() when logits are available
+
     return {
         "accuracy":              round(acc, 4),
-        "macro_f1":              round(macro, 4),
+        "macro_f1":              round(macro_f1, 4),
+        "macro_sensitivity":     macro_sensitivity,
+        "macro_specificity":     macro_specificity,
+        "macro_auc":             macro_auc,
         "per_class_sensitivity": per_class_sensitivity,
     }
 
@@ -220,6 +270,7 @@ def evaluate(
         num_workers=4, pin_memory=(device != "cpu"),
     )
 
+    import numpy as np
     preds = _collect_predictions(model.to(device), loader, device)
 
     results = {
@@ -229,6 +280,23 @@ def evaluate(
         "l2": _level_metrics(preds["true_l2"], preds["pred_l2"], L2_CLASSES),
         "l3": _level_metrics(preds["true_l3"], preds["pred_l3"], L3_CLASSES),
     }
+
+    # Fill in macro AUC (one-vs-rest) using collected softmax probabilities
+    for level, key_true, key_prob, n_cls in [
+        ("l1", "true_l1", "prob_l1", 3),
+        ("l2", "true_l2", "prob_l2", 4),
+        ("l3", "true_l3", "prob_l3", 15),
+    ]:
+        try:
+            auc = roc_auc_score(
+                preds[key_true],
+                np.array(preds[key_prob]),
+                multi_class="ovr",
+                average="macro",
+            )
+            results[level]["macro_auc"] = round(float(auc), 4)
+        except Exception:
+            results[level]["macro_auc"] = None
 
     # --- Save outputs ---
     if output_dir is None:
