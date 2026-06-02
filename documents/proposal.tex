@@ -1,0 +1,487 @@
+%%
+%% This is file `main.tex' based on `sample-sigconf.tex' (q.v. for spurce of that,
+%%
+%% IMPORTANT NOTICE:
+%% 
+%% For the copyright see the original source file `sample-sigconf.tex'
+%% in the `Sample' folder.
+%%
+%% For distribution of the original source see the terms
+%% for copying and modification in the file samples.dtx.
+%% 
+%% This generated file may be distributed as long as the
+%% original source files, as listed above, are part of the
+%% same distribution. (The sources need not necessarily be
+%% in the same archive or directory.)
+%%
+%% Commands for TeXCount
+%TC:macro \cite [option:text,text]
+%TC:macro \citep [option:text,text]
+%TC:macro \citet [option:text,text]
+%TC:envir table 0 1
+%TC:envir table* 0 1
+%TC:envir tabular [ignore] word
+%TC:envir displaymath 0 word
+%TC:envir math 0 word
+%TC:envir comment 0 0
+%%
+%%
+%% The first command in your LaTeX source must be the \documentclass command.
+
+%% NOTE that a single column version is required for 
+%% submission and peer review. This can be done by changing
+%% the \doucmentclass[...]{acmart} in this template to 
+%%\documentclass[manuscript,review,anonymous]{acmart}
+%% This version is used for drafting and final submission
+\documentclass[sigconf]{acmart}
+
+
+%% 
+%% To ensure 100% compatibility, please check the white list of
+%% approved LaTeX packages to be used with the Master Article Template at
+%% https://www.acm.org/publications/taps/whitelist-of-latex-packages 
+%% before creating your document. The white list page provides 
+%% information on how to submit additional LaTeX packages for 
+%% review and adoption.
+%% Fonts used in the template cannot be substituted; margin 
+%% adjustments are not allowed.
+
+%%
+%% \BibTeX command to typeset BibTeX logo in the docs
+\AtBeginDocument{%
+  \providecommand\BibTeX{{%
+    \normalfont B\kern-0.5em{\scshape i\kern-0.25em b}\kern-0.8em\TeX}}}
+
+%% Rights management information.  This information is sent to you
+%% when you complete the rights form.  These commands have SAMPLE
+%% values in them; it is your responsibility as an author to replace
+%% the commands and values with those provided to you when you
+%% complete the rights form.
+\setcopyright{acmlicensed}
+\copyrightyear{2024}
+\acmYear{2024}
+\acmDOI{XXXXXXX.XXXXXXX}
+
+%% These commands are for a PROCEEDINGS abstract or paper.
+\acmConference[Conference acronym 'XX]{Make sure to enter the correct
+  conference title from your rights confirmation email}{June 03--05,
+  2018}{Woodstock, NY}
+%
+%  Uncomment \acmBooktitle if th title of the proceedings is different
+%  from ``Proceedings of ...''!
+%
+%\acmBooktitle{Woodstock '18: ACM Symposium on Neural Gaze Detection,
+%  June 03--05, 2018, Woodstock, NY} 
+\acmISBN{978-1-4503-XXXX-X/18/06}
+
+
+%%
+%% Submission ID.
+%% Use this when submitting an article to a sponsored event. You'll
+%% receive a unique submission ID from the organizers
+%% of the event, and this ID should be used as the parameter to this command.
+%%\acmSubmissionID{123-A56-BU3}
+
+%%
+%% For managing citations, it is recommended to use bibliography
+%% files in BibTeX format.
+%%
+%% You can then either use BibTeX with the ACM-Reference-Format style,
+%% or BibLaTeX with the acmnumeric or acmauthoryear sytles, that include
+%% support for advanced citation of software artefact from the
+%% biblatex-software package, also separately available on CTAN.
+%%
+%% Look at the sample-*-biblatex.tex files for templates showcasing
+%% the biblatex styles.
+%%
+
+%%
+%% The majority of ACM publications use numbered citations and
+%% references.  The command \citestyle{authoryear} switches to the
+%% "author year" style.
+%%
+%% If you are preparing content for an event
+%% sponsored by ACM SIGGRAPH, you must use the "author year" style of
+%% citations and references.
+%% Uncommenting
+%% the next command will enable that style.
+%%\citestyle{acmauthoryear}
+
+%%
+%% end of the preamble, start of the body of the document source.
+
+%% % Location of your graphics files for figures, here a sub-folder to the main project folder
+\graphicspath{{./images/}} 
+
+
+\begin{document}
+
+%%
+%% The "title" command has an optional parameter,
+%% allowing the author to define a "short title" to be used in page headers.
+\title{Hierarchical Deep Learning for RNA Motif Classification from Cryo-EM Density Maps}
+
+%%
+%% The "author" command and its associated commands are used to define
+%% the authors and their affiliations.
+%% Of note is the shared affiliation of the first two authors, and the
+%% "authornote" and "authornotemark" commands
+%% used to denote shared contribution to the research.
+\author{Ketsia Mbaku}
+\email{ketsia@uw.edu}
+\affiliation{%
+  \institution{University of Washington, Bothell}
+  \streetaddress{18115 Campus Way NE}
+  \city{Bothell}
+  \state{Washington}
+  \country{USA}
+  \postcode{98011}
+}
+
+%%
+%% By default, the full list of authors will be used in the page
+%% headers. Often, this list is too long, and will overlap
+%% other information printed in the page headers. This command allows
+%% the author to define a more concise list
+%% of authors' names for this purpose.
+\renewcommand{\shortauthors}{Mbaku}
+
+%%
+%% The abstract is a short summary of the work to be presented in the
+%% article.
+\begin{abstract}
+Accurate classification of RNA secondary structural motifs from
+cryo-EM density maps is a key step toward automated RNA structure
+prediction pipelines. Prior work established that broad motif
+categories can be predicted from three-dimensional density volumes,
+but fine-grained classification across the full 25-class CoSSMos
+taxonomy has remained out of reach, with flat supervision yielding
+only 38.4\% accuracy in our preliminary baseline experiments. We
+attribute this failure to the absence of structural guidance in
+the training objective: a flat cross-entropy loss treats all
+confusions equally, offering no signal that reflects the biological
+organization of the label space. In this work we propose a hierarchical classification
+framework in which motifs are first distinguished by topology,
+then by strand symmetry, and finally by size, mirroring the
+natural structure of the CoSSMos taxonomy. We evaluate three deep
+learning models of increasing sophistication on a resolution-filtered
+subset of a large-scale cryo-EM RNA motif dataset: a flat 3D U-Net
+encoder retrained as a 25-class baseline, a 3D ResNet-18 trained
+with a multi-head hierarchical loss, and a 3D Swin Transformer
+with conditional hierarchical inference in which each prediction
+level gates the next. Across all 25 classes, an average of 87.4\%
+of dataset instances satisfy our 5.0~\AA{} resolution criterion,
+with class-weighted training applied to compensate for the
+underrepresented classes that fall below this average. We expect
+hierarchical supervision to improve
+accuracy and to reduce the within-family confusion
+errors that dominate the baseline, with the
+Swin Transformer providing additional gains through
+spatial reasoning over the density volume.
+\end{abstract}
+
+%%
+%% The code below is generated by the tool at: http://dl.acm.org/ccs.cfm
+%% Please copy and paste the code instead of the example below.
+%%
+
+
+%% The following are not a requirement, delete if not using
+\received{12 May 2026}  %% inital submission date
+
+%%
+%% This command processes the author and affiliation and title
+%% information and builds the first part of the formatted document.
+\maketitle
+\section{Introduction}
+% ============================================================
+ 
+\subsection{Background and Motivation}
+ 
+Ribonucleic acid plays a central role in a broad range of cellular
+processes, from catalyzing biochemical reactions and regulating gene
+expression to serving as the primary genetic material in many viruses
+\cite{tinoco1999}. Unlike the rigid double-helical structure
+of DNA, single-stranded RNA folds back on itself through intramolecular
+base pairing, producing a rich landscape of three-dimensional
+conformations. These conformations are not random: the same local
+structural patterns, known as secondary structural motifs, recur
+across evolutionarily distant RNA molecules and are tightly coupled
+to biological function \cite{leontis2001}. Because many of these
+motifs serve as binding sites for small molecules and therapeutic
+agents, their accurate identification and classification is of direct
+relevance to structure-based drug discovery \cite{porter2017}.
+
+A key limitation of current approaches is that they operate at the
+level of full reconstruction, attempting to trace backbone
+coordinates across an entire map before any motif-level understanding
+is established. This top-down strategy is particularly fragile for RNA,
+where flexible single-stranded regions and repetitive structural elements
+make global tracing error-prone. An alternative strategy, motivated by
+the modular nature of RNA architecture, is to first classify and localize
+recurring local motifs from density data, and then use these intermediate
+labels to guide downstream structure prediction. Realizing this strategy
+requires machine learning models capable of recognizing
+structural categories directly from three-dimensional density volumes.
+\subsection{Related Work}
+A critical prerequisite for motif classification from
+cryo-EM is the availability of a dataset pairing density with motif-level structural labels.
+\citeauthor{murugadass2026} \cite{murugadass2026} recently introduced
+such a resource: a dataset of over 125,000 motif-resolved cryo-EM
+density maps spanning the full 25-class CoSSMos taxonomy, covering
+resolutions from 1.5 to 34~\AA{}. Each instance is represented as a
+standardized 64$\times$64$\times$64 voxel patch centered on the motif,
+with voxel-level labels for backbone, ribose sugar, and nucleobase
+components derived from aligned atomic models. To demonstrate the
+dataset's utility for supervised learning, the authors trained a 3D convolutional neural network comprising three
+convolutional blocks on a subset of high-resolution maps
+(1.5--2.8~\AA{}), collapsing the 25 fine-grained CoSSMos classes into
+five groups: symmetric internal loops, asymmetric internal loops,
+hairpins, bulges, and a background class. At this coarse granularity,
+the classifier achieved a macro-average specificity of 0.948, confirming
+that the density signal is sufficient to discriminate broad structural
+categories. However, the transition from 25 fine-grained to 5 coarse
+classes did not explicitly encode the
+symmetric-to-asymmetric distinction within internal loops, and
+discards the size-level granularity that distinguishes motifs within
+each family. Whether fine-grained classification across the full
+CoSSMos taxonomy is achievable from density data alone was left as
+an open question by the authors.
+ 
+In a prior work as part of CSS581 Machine Learning course during the Fall 2025, we conducted a comparison of classical
+and deep learning classifiers for RNA motif classification from
+cryo-EM density, using a subset of 15 symmetric motif classes (five
+hairpin lengths, five bulge sizes, and five symmetric internal loop
+sizes) drawn from the same dataset. A CNN model was evaluated at both
+6-class and 15-class granularity. At coarse granularity,
+the model exceeded 92\% accuracy, confirming the feasibility of
+broad category prediction. However, at fine-grained granularity the
+picture diverged sharply: the 3D CNN collapsed to 55.69\% accuracy. Confusion analysis revealed that errors were
+concentrated within motif families, primarily between size-adjacent
+classes such as bulge3 and bulge4. Critically, the
+flat 15-class label space provided no structural guidance to the
+model: a confusion between bulge2 and bulge3 was penalized identically
+to a confusion between a bulge and a hairpin, despite the former being
+a far less serious error from a biological standpoint.
+ 
+This literature review reveals three gaps that motivate
+the present work. First, no prior study has demonstrated
+fine-grained classification across the full 25-class CoSSMos taxonomy
+from cryo-EM density. The closest attempts either stopped at 5
+coarse classes \cite{murugadass2026} or at 15 symmetric classes
+\cite{mbaku2025}. Second, both prior works
+employed label spaces that ignore the biological hierarchy
+inherent in the CoSSMos taxonomy. Third, more powerful  architectures
+capable of capturing spatial dependencies within density
+patches, such as residual networks and vision transformers, have not
+been evaluated in this domain.
+
+\subsection{Research Questions and Hypotheses}
+This work evaluates whether training a model to predict motif labels at multiple levels of biological detail, rather than all 25 classes at once, leads to better fine-grained classification. We hypothesize that learning broad categories first and progressively refining toward size-level distinctions will give the model structural guidance that a flat training objective cannot provide.
+We also ask whether this hierarchical approach specifically fixes the confusion patterns observed in prior work, particularly the mixing of symmetric and asymmetric internal loops and errors between size-adjacent classes within the same family. We hypothesize that supervising the symmetry level explicitly will force the model to resolve that distinction early, before attempting the harder size-level predictions.
+Finally, we aim to explore whether making predictions conditionally, where each level informs the next, works better than predicting all levels independently in parallel, and whether a transformer-based architecture captures features that convolutional models miss. We expect both to contribute, especially on the rarest and most structurally similar classes.
+
+
+% ============================================================
+\section{Methods}
+% ============================================================
+ 
+\subsection{Data Source and Scope}
+
+This work builds on the large-scale cryo-EM RNA motif dataset
+introduced by \citeauthor{murugadass2026} \cite{murugadass2026},
+which provides over 125,000 motif-resolved density map segments
+spanning all 25 RNA CoSSMos \cite{cossmosdb} secondary structural motif classes \cite{murugadass2026dataset}. Each segment is a standardized
+$64 \times 64 \times 64$ voxel patch extracted from experimental
+EMDB maps \cite{emdb2023} and paired with its corresponding atomic
+model from the RCSB Protein Data Bank \cite{rcsb2019}. The full
+dataset covers a resolution range of 1.5 to 34.0~\AA{}, but
+structural detail degrades substantially beyond 5~\AA{}, with
+cross-correlation scores dropping from the 0.70--0.75 range at
+3.0--4.0~\AA{} to the 0.50--0.60 range at 5.0--10.0~\AA{}
+\cite{murugadass2026}. To ensure that density features are
+sufficiently resolved to support fine-grained classification, we
+restrict our working dataset to maps with a reported global
+resolution of 5.0~\AA{} or better.
+
+To characterize the usable dataset under this constraint, we
+developed two preprocessing scripts. The first queries the metadata
+of each segmented motif instance to retrieve the reported resolution
+of its source EMDB map, retaining only instances at or below
+5.0~\AA{}. The second tabulates per-class instance counts within
+the filtered set to identify any classes at risk of severe
+underrepresentation. Figure~\ref{fig:resolution_histogram} shows
+the percentage of maps meeting the resolution criterion for each
+of the 25 motif classes. Across all classes, an average of 87.4\%
+of instances satisfy the threshold, indicating that the resolution
+filter preserves the large majority of the dataset. Most classes
+retain above 85\% of their instances, with several exceeding 95\%,
+including the 1$\times$5 asymmetric loop (96.7\%), bulge5 (97.7\%),
+and bulge4 (96.0\%). However, three classes fall below the overall
+average by a notable margin: bulge1 retains only 66.2\% of its
+instances, hairpin4 retains 66.3\%, and hairpin7 retains 71.6\%.
+The 3$\times$5 and 4$\times$4 asymmetric loop classes also show
+modest shortfalls at 83.7\% and 79.6\% respectively. To mitigate
+the impact of these gaps, class-weighted loss and stratified
+sampling will be applied during training, ensuring that
+underrepresented classes receive proportionally greater emphasis
+without being discarded from the evaluation.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\columnwidth]{histogram.png}
+    \caption{Percentage of motif instances per class satisfying the
+    5.0~\AA{} resolution threshold across all 25 CoSSMos motif
+    classes.}
+    \label{fig:resolution_histogram}
+\end{figure}
+\subsection{Baseline Model}
+\label{sec:baseline}
+% ============================================================
+ 
+The baseline model is a direct extension of the architecture
+developed in prior CSS581 work, retrained here on the
+full 25-class label space to establish the performance ceiling
+achievable without hierarchical supervision. The architecture
+is a CNN with three downsampling stages, processing
+a normalized $64 \times 64 \times 64$ density patch as a
+single-channel input. Each downsampling stage applies a pair of
+$3 \times 3 \times 3$ convolutions with batch normalization and
+ReLU activations, followed by $2 \times 2 \times 2$ max pooling.
+Channel dimensions progress from 1 to 32, 64, 128, and 256,
+with adaptive average pooling applied at the bottleneck to produce
+a fixed 256-dimensional density embedding independent of voxel
+spacing. In the original work \cite{mbaku2025}, this density
+embedding was fused with hand-crafted sequence and base-pairing 
+features obtained from PDB via parallel MLP branches before classification. In this
+work, we remove those feature branches and train the
+model on density alone, for consistency with the subsequent models to be trained and
+to isolate the contribution of the density across all
+three architectures.
+ 
+Preliminary results from retraining this architecture on the
+25-class flat objective are summarized in Table~\ref{tab:baseline_results}.
+As anticipated, extending from the 15-class setting of prior work
+to the full 25-class taxonomy produces a marked degradation in
+classification performance. Overall test accuracy falls to 38.4\%,
+compared to 55.69\% on 15 classes, reflecting
+the additional difficulty introduced by the 10 asymmetric internal
+loop subclasses, which share highly similar density signatures
+and are severely underrepresented relative to the bulge and hairpin
+families. Macro-average sensitivity drops to 0.31, indicating that
+the model systematically fails to recover many fine-grained classes. These results
+confirm that flat supervision at the 25-class level is insufficient
+and motivate the hierarchical training strategies to be evaluated in
+subsequent models as part of this project.
+ 
+\begin{table}[h]
+\caption{Baseline model performance on the flat 25-class
+classification task}
+\label{tab:baseline_results}
+\centering
+\begin{tabular}{lc}
+\toprule
+Metric & Value \\
+\midrule
+Overall accuracy         & 38.4\% \\
+Macro sensitivity        & 0.31 \\
+Macro specificity        & 0.94 \\
+Macro AUC (one-vs-rest)  & 0.84 \\
+\midrule
+Sensitivity -- hairpin3  & 0.74 \\
+Sensitivity -- hairpin7  & 0.61 \\
+Sensitivity -- bulge2    & 0.78 \\
+Sensitivity -- bulge5    & 0.43 \\
+Sensitivity -- 1$\times$1 symmetric & 0.59 \\
+Sensitivity -- 5$\times$5 symmetric & 0.34 \\
+Sensitivity -- 1$\times$2 asymmetric & 0.27 \\
+Sensitivity -- 4$\times$5 asymmetric & 0.08 \\
+\bottomrule
+\end{tabular}
+\end{table}
+ 
+\subsection{Proposed Hierarchy and Project Plan}
+ 
+We organize the 25 CoSSMos classes into a three-level biological
+hierarchy that forms the backbone of both the training objectives
+and the experimental progression. At the first level (L1), motifs
+are grouped by topology into hairpins, internal loops, and bulges,
+reflecting the most geometrically distinct density signatures. At
+the second level (L2), internal loops are further split by strand
+symmetry into symmetric and asymmetric subclasses, a distinction
+never explicitly encoded in prior work and the locus of the hardest
+confusions in \cite{mbaku2025}. The third level (L3) retains all
+25 fine-grained CoSSMos classes and is the primary evaluation
+target; L1 and L2 serve exclusively as intermediate supervision
+signals. The full mapping is shown in Table~\ref{tab:hierarchy}.
+ 
+\begin{table}[h]
+\caption{Three-level hierarchy over all 25 CoSSMos motif classes.}
+\label{tab:hierarchy}
+\centering
+\begin{tabular}{lll}
+\toprule
+L1 (Topology) & L2 (Symmetry) & L3 (25 classes) \\
+\midrule
+Hairpin       & Hairpin        & hairpin3--hairpin7 \\
+Internal loop & Symmetric      & 1$\times$1 -- 5$\times$5 \\
+Internal loop & Asymmetric     & 1$\times$2, \ldots, 4$\times$5 \\
+Bulge         & Bulge          & bulge1--bulge5 \\
+\bottomrule
+\end{tabular}
+\end{table}
+ 
+The remaining work proceeds in four tasks. The first is to complete
+the preprocessing pipeline: resolution filtering and per-class
+counting scripts have been developed and validated; full execution
+across the corpus is ongoing, after which stratified splits will
+be locked and shared across all models. The second task is to
+implement a 3D ResNet-18 with three parallel
+classification heads trained jointly under the weighted hierarchical
+loss $\mathcal{L} = \alpha\mathcal{L}_{L1} + \beta\mathcal{L}_{L2}
++ \gamma\mathcal{L}_{L3}$, with a grid search over the weighting
+hyperparameters. The third task is a 3D Swin Transformer
+\cite{swin2021} with conditional hierarchical inference, where the
+L1 softmax output gates the L2 head and the L2 output gates L3,
+enforcing a decision path consistent with the biological hierarchy;
+gradient checkpointing will be applied if memory constraints
+require it. The fourth task is a unified comparative evaluation
+on the held-out test set, including per-class sensitivity across
+all 25 classes, confusion matrix analysis at each hierarchy
+level, and an ablation study isolating the contribution of the
+hierarchical loss from the architectural improvement in the second model.
+
+\section{Conclusion}
+
+This report presents a progress update toward hierarchical deep
+learning classification of RNA secondary structural motifs from
+cryo-EM density maps. Building on prior work that identified the
+failure of flat supervision at fine-grained granularity, we
+introduced a three-level biological hierarchy over all 25 CoSSMos
+motif classes and proposed three models designed to exploit it
+progressively. Preliminary baseline results confirm that flat
+25-class training is insufficient, achieving only 38.4\% accuracy
+with systematic failure on the asymmetric internal loop family,
+establishing a clear performance floor that the hierarchical
+models are designed to surpass. Data preprocessing results show
+that 87.4\% of available instances satisfy the 5.0~\AA{} resolution
+criterion, providing a representative
+training set across all motif classes.
+
+The remaining work centers on implementing and evaluating the
+3D ResNet-18 with hierarchical loss and the 3D Swin Transformer
+with conditional inference. Together these models will test whether
+hierarchical supervision recovers fine-grained accuracy, whether
+it specifically repairs the symmetry-level confusions documented
+in the baseline, and whether attention-based spatial reasoning
+provides complementary gains over convolutional architectures.
+Beyond the immediate experimental goals, this work constitutes
+a
+benchmark that can serve as a foundation for future motif-aware
+RNA structure prediction methods.
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{references.bib}
+\end{document}
+\endinput
+%%
+%% End of file `main.tex'.

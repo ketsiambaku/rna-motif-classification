@@ -1,0 +1,292 @@
+"""
+Comprehensive post-training evaluation for RNA motif classification models.
+
+Unlike the lightweight per-epoch validation in train.py, this module runs
+full inference on a split and produces:
+  - Accuracy and macro-F1 at L1, L2, and L3
+  - Per-class sensitivity at each level
+  - Confusion matrices (saved as PNG figures)
+  - A JSON summary of all metrics
+
+Usage:
+    from src.evaluate import evaluate, load_model
+    results = evaluate(model, split="test", device="mps")
+    # results saved to checkpoints/<model_name>/eval_test.json
+    #               and checkpoints/<model_name>/confusion_*.png
+"""
+import json
+import sys
+from pathlib import Path
+from typing import Optional
+
+import matplotlib.pyplot as plt
+import numpy as np
+import torch
+import torch.nn as nn
+from sklearn.metrics import (
+    accuracy_score,
+    confusion_matrix,
+    f1_score,
+    classification_report,
+)
+from torch.utils.data import DataLoader
+from tqdm import tqdm
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(PROJECT_ROOT))
+
+from scripts.label_map import (
+    ALL25_CLASSES,
+    CLASS_IDX_TO_L1_IDX,
+    CLASS_IDX_TO_L2_IDX,
+    L1_CLASSES,
+    L2_CLASSES,
+    L3_CLASSES,
+)
+from src.dataset import RNAMotifDataset
+
+
+# ---------------------------------------------------------------------------
+# Inference
+# ---------------------------------------------------------------------------
+
+def _collect_predictions(
+    model: nn.Module,
+    loader: DataLoader,
+    device: str,
+) -> dict[str, list]:
+    """Run full inference and collect ground-truth + predictions for all levels.
+
+    Returns a dict with keys:
+        true_l1, pred_l1  — L1 topology indices  (all samples)
+        true_l2, pred_l2  — L2 symmetry indices   (all samples)
+        true_l3, pred_l3  — L3 fine-grained indices (L3-eligible samples only)
+        true_cls, pred_cls — flat 25-class indices  (all samples; M1 only)
+    """
+    l1_map = torch.tensor(CLASS_IDX_TO_L1_IDX, dtype=torch.long)
+    l2_map = torch.tensor(CLASS_IDX_TO_L2_IDX, dtype=torch.long)
+
+    out: dict[str, list] = {k: [] for k in
+                            ["true_l1", "pred_l1",
+                             "true_l2", "pred_l2",
+                             "true_l3", "pred_l3",
+                             "true_cls", "pred_cls"]}
+
+    model.eval()
+    with torch.no_grad():
+        for batch in tqdm(loader, desc="Inference", leave=False, dynamic_ncols=True):
+            batch["volume"] = batch["volume"].to(device)
+            output = model(batch["volume"])
+
+            if isinstance(output, dict):
+                pred_l1  = output["l1"].argmax(1).cpu()
+                pred_l2  = output["l2"].argmax(1).cpu()
+                pred_l3  = output["l3"].argmax(1).cpu()
+                pred_cls = pred_l3  # best proxy for flat class
+            else:
+                pred_cls = output.argmax(1).cpu()
+                pred_l1  = l1_map[pred_cls]
+                pred_l2  = l2_map[pred_cls]
+                pred_l3  = pred_cls  # class_idx == l3_idx for L3-eligible
+
+            true_l1 = batch["l1_idx"]
+            true_l2 = batch["l2_idx"]
+            true_l3 = batch["l3_idx"]
+            true_cls = batch["class_idx"] if "class_idx" in batch else true_l3
+
+            out["true_l1"].extend(true_l1.tolist())
+            out["pred_l1"].extend(pred_l1.tolist())
+            out["true_l2"].extend(true_l2.tolist())
+            out["pred_l2"].extend(pred_l2.tolist())
+            out["true_cls"].extend(true_cls.tolist())
+            out["pred_cls"].extend(pred_cls.tolist())
+
+            # L3: only L3-eligible samples
+            mask = true_l3 != -1
+            if mask.any():
+                out["true_l3"].extend(true_l3[mask].tolist())
+                out["pred_l3"].extend(pred_l3[mask].tolist())
+
+    return out
+
+
+# ---------------------------------------------------------------------------
+# Metrics helpers
+# ---------------------------------------------------------------------------
+
+def _level_metrics(
+    y_true: list[int],
+    y_pred: list[int],
+    class_names: list[str],
+) -> dict:
+    """Compute accuracy, macro-F1, and per-class sensitivity for one level."""
+    acc    = accuracy_score(y_true, y_pred)
+    macro  = f1_score(y_true, y_pred, average="macro", zero_division=0)
+    report = classification_report(
+        y_true, y_pred,
+        labels=list(range(len(class_names))),
+        target_names=class_names,
+        output_dict=True,
+        zero_division=0,
+    )
+    per_class_sensitivity = {
+        cls: round(report[cls]["recall"], 4)
+        for cls in class_names
+        if cls in report
+    }
+    return {
+        "accuracy":              round(acc, 4),
+        "macro_f1":              round(macro, 4),
+        "per_class_sensitivity": per_class_sensitivity,
+    }
+
+
+# ---------------------------------------------------------------------------
+# Confusion matrix figure
+# ---------------------------------------------------------------------------
+
+def _plot_confusion(
+    y_true: list[int],
+    y_pred: list[int],
+    class_names: list[str],
+    title: str,
+    save_path: Path,
+) -> None:
+    cm = confusion_matrix(y_true, y_pred, labels=list(range(len(class_names))))
+    # Normalise rows to [0,1] for readability across imbalanced classes
+    cm_norm = cm.astype(float)
+    row_sums = cm_norm.sum(axis=1, keepdims=True)
+    row_sums[row_sums == 0] = 1
+    cm_norm /= row_sums
+
+    n = len(class_names)
+    fig_size = max(8, n * 0.5)
+    fig, ax = plt.subplots(figsize=(fig_size, fig_size * 0.85))
+    im = ax.imshow(cm_norm, interpolation="nearest", cmap="Blues", vmin=0, vmax=1)
+    plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+
+    ax.set(
+        xticks=range(n), yticks=range(n),
+        xticklabels=class_names, yticklabels=class_names,
+        xlabel="Predicted", ylabel="True", title=title,
+    )
+    plt.setp(ax.get_xticklabels(), rotation=45, ha="right", fontsize=8)
+    plt.setp(ax.get_yticklabels(), fontsize=8)
+
+    # Annotate cells with raw counts
+    thresh = 0.5
+    for i in range(n):
+        for j in range(n):
+            if cm[i, j] > 0:
+                ax.text(j, i, str(cm[i, j]),
+                        ha="center", va="center", fontsize=6,
+                        color="white" if cm_norm[i, j] > thresh else "black")
+
+    plt.tight_layout()
+    plt.savefig(save_path, dpi=150)
+    plt.close(fig)
+
+
+# ---------------------------------------------------------------------------
+# Main evaluation entry point
+# ---------------------------------------------------------------------------
+
+def evaluate(
+    model: nn.Module,
+    split: str = "test",
+    device: str = "cpu",
+    batch_size: int = 64,
+    output_dir: Optional[Path] = None,
+) -> dict:
+    """Run comprehensive evaluation on a data split.
+
+    Args:
+        model:      Trained model (M1, M2, or M3).
+        split:      "train", "val", or "test".
+        device:     Torch device string.
+        batch_size: Inference batch size (can be larger than training).
+        output_dir: Directory for saving JSON + figures. Defaults to
+                    checkpoints/<model_name>/ if model has a name attribute,
+                    otherwise current working directory.
+
+    Returns:
+        dict with keys "l1", "l2", "l3", each containing accuracy,
+        macro_f1, and per_class_sensitivity.
+    """
+    dataset = RNAMotifDataset(split=split)
+    loader  = DataLoader(
+        dataset, batch_size=batch_size, shuffle=False,
+        num_workers=4, pin_memory=(device != "cpu"),
+    )
+
+    preds = _collect_predictions(model.to(device), loader, device)
+
+    results = {
+        "split": split,
+        "n_samples": len(dataset),
+        "l1": _level_metrics(preds["true_l1"], preds["pred_l1"], L1_CLASSES),
+        "l2": _level_metrics(preds["true_l2"], preds["pred_l2"], L2_CLASSES),
+        "l3": _level_metrics(preds["true_l3"], preds["pred_l3"], L3_CLASSES),
+    }
+
+    # --- Save outputs ---
+    if output_dir is None:
+        name = getattr(model, "name", "model")
+        output_dir = PROJECT_ROOT / "checkpoints" / name
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    json_path = output_dir / f"eval_{split}.json"
+    with open(json_path, "w") as f:
+        json.dump(results, f, indent=2)
+
+    _plot_confusion(preds["true_l1"], preds["pred_l1"], L1_CLASSES,
+                    f"L1 Confusion ({split})",
+                    output_dir / f"confusion_l1_{split}.png")
+    _plot_confusion(preds["true_l2"], preds["pred_l2"], L2_CLASSES,
+                    f"L2 Confusion ({split})",
+                    output_dir / f"confusion_l2_{split}.png")
+    _plot_confusion(preds["true_l3"], preds["pred_l3"], L3_CLASSES,
+                    f"L3 Confusion ({split})",
+                    output_dir / f"confusion_l3_{split}.png")
+
+    # --- Print summary ---
+    print(f"\n{'='*55}")
+    print(f"  Evaluation — {split.upper()}  ({results['n_samples']:,} samples)")
+    print(f"{'='*55}")
+    for level, label in [("l1", "L1 topology"), ("l2", "L2 symmetry"), ("l3", "L3 fine-grained")]:
+        m = results[level]
+        print(f"  {label:<20}  acc={m['accuracy']:.4f}  macro-F1={m['macro_f1']:.4f}")
+    print(f"{'='*55}")
+    print(f"  Saved: {json_path}")
+
+    return results
+
+
+# ---------------------------------------------------------------------------
+# Checkpoint loader convenience
+# ---------------------------------------------------------------------------
+
+def load_model(
+    model: nn.Module,
+    checkpoint_path: Path,
+    device: str = "cpu",
+) -> nn.Module:
+    """Load model weights from a checkpoint saved by train.py.
+
+    Args:
+        model:           Instantiated model with the same architecture used
+                         during training (weights will be overwritten).
+        checkpoint_path: Path to a .pt file saved by train.py.
+        device:          Device to load the model onto.
+    """
+    ckpt = torch.load(checkpoint_path, map_location=device)
+    model.load_state_dict(ckpt["model_state"])
+    model = model.to(device)
+    model.eval()
+    epoch = ckpt.get("epoch", "?")
+    f1    = ckpt.get("best_val_f1", "?")
+    print(f"Loaded checkpoint from epoch {epoch}  (best val L3-F1={f1})")
+    return model
+
+

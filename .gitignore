@@ -1,0 +1,37 @@
+# ── Python ────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+.venv-1/
+*.egg-info/
+dist/
+build/
+
+# ── Data (large binary files — ~12 GB) ────────────────
+# Ignore all MRC class subfolders; keep manifest + histogram
+data/*
+!data/manifest.csv
+!data/data_class_histogram.png
+
+# Raw source datasets
+dataset/
+dataset2/
+dataset2.tar.gz
+homework2.zip
+
+# ── Checkpoints (model weights) ───────────────────────
+checkpoints/
+
+# ── OS / IDE ──────────────────────────────────────────
+.DS_Store
+.idea/
+.vscode/
+*.swp
+.claude/
+
+# ── Deprecated / archived ─────────────────────────────
+ML Project(deprecated)/
+
+# ── Misc ──────────────────────────────────────────────
+*.log
