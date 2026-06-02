@@ -27,6 +27,8 @@ IDX=$(( $1 - 1 ))
 
 # ── Config ────────────────────────────────────────────────────────────────────
 REMOTE_USER="ketsia"
+REMOTE_BASE="/data/ketsia"          # lab servers require work under /data/ketsia
+RDIR="$REMOTE_BASE/rna-motif-classification"
 BRANCH="final"
 REPO_URL="https://github.com/ketsiambaku/rna-motif-classification.git"
 LOCAL_DATA="$(pwd)/data"
@@ -95,7 +97,7 @@ _ssh() { ssh -o ControlMaster=no -o "ControlPath=$CTRL" "$HOST" "$@"; }
 info "Syncing repo (branch: $BRANCH)..."
 _ssh "bash -s" <<REMOTE
 set -e
-RDIR=\$HOME/rna-motif-classification
+RDIR="$RDIR"
 if [ -d "\$RDIR/.git" ]; then
     echo "  Repo exists — pulling latest..."
     cd "\$RDIR"
@@ -103,7 +105,8 @@ if [ -d "\$RDIR/.git" ]; then
     git checkout --quiet $BRANCH 2>/dev/null || git checkout --quiet -b $BRANCH origin/$BRANCH
     git pull --quiet origin $BRANCH
 else
-    echo "  Fresh clone..."
+    echo "  Fresh clone into $RDIR..."
+    mkdir -p "$REMOTE_BASE"
     git clone --quiet --branch $BRANCH "$REPO_URL" "\$RDIR"
 fi
 echo "  Branch: \$(cd \$RDIR && git rev-parse --abbrev-ref HEAD)  commit: \$(cd \$RDIR && git rev-parse --short HEAD)"
@@ -141,7 +144,7 @@ else
 fi
 
 # Remaining packages (pip skips anything already up to date)
-cd $HOME/rna-motif-classification
+cd /data/ketsia/rna-motif-classification
 $PIP install --user -q -r requirements.txt
 echo "  All packages ready"
 REMOTE
@@ -152,7 +155,7 @@ info "Syncing data/ (~12 GB first run, fast on re-runs)..."
 rsync -az --info=progress2 \
     -e "ssh -o ControlMaster=no -o ControlPath=$CTRL" \
     "$LOCAL_DATA/" \
-    "$HOST:\$HOME/rna-motif-classification/data/"
+    "$HOST:$RDIR/data/"
 ok "Data synced"
 
 # ── Step 6: Launch training ───────────────────────────────────────────────────
@@ -163,7 +166,7 @@ else
     info "Launching training in tmux session '$SESSION'..."
     _ssh "bash -s" <<REMOTE
 set -e
-cd \$HOME/rna-motif-classification
+cd $RDIR
 mkdir -p checkpoints/$MODEL
 tmux new-session -d -s "$SESSION" \
     "python scripts/run_training.py --model $MODEL 2>&1 | tee checkpoints/$MODEL/train.log; echo '=== Done ==='"
@@ -177,6 +180,6 @@ echo
 echo -e "${BOLD}${GREEN}  ✓ $SERVER is set up and training.${NC}"
 echo
 echo -e "  Attach to training  :  ssh $HOST  →  tmux attach -t $SESSION"
-echo -e "  Watch log           :  ssh $HOST 'tail -f ~/rna-motif-classification/checkpoints/$MODEL/train.log'"
-echo -e "  Retrieve checkpoint :  scp $HOST:~/rna-motif-classification/checkpoints/$MODEL/best.pt ./checkpoints/"
+echo -e "  Watch log           :  ssh $HOST 'tail -f $RDIR/checkpoints/$MODEL/train.log'"
+echo -e "  Retrieve checkpoint :  scp $HOST:$RDIR/checkpoints/$MODEL/best.pt ./checkpoints/"
 echo
