@@ -58,15 +58,21 @@ def _print_results(results: dict) -> None:
               f"{m['macro_sensitivity']:>12.4f} {m['macro_specificity']:>12.4f} {auc:>8}")
 
     print(f"\n  {'─'*63}")
-    print(f"  Per-class sensitivity at L3:")
-    for cls, sens in results["l3"]["per_class_sensitivity"].items():
-        bar = "█" * int(sens * 20)
-        print(f"    {cls:<14}  {sens:.4f}  {bar}")
+    print(f"  Per-class F1 at L3:")
+    print(f"    {'Class':<14}  {'F1':>6}  {'Recall':>6}")
+    for cls in results["l3"]["per_class_f1"]:
+        f1   = results["l3"]["per_class_f1"][cls]
+        rec  = results["l3"]["per_class_sensitivity"][cls]
+        bar  = "█" * int(f1 * 20)
+        print(f"    {cls:<14}  {f1:.4f}  {rec:.4f}  {bar}")
 
-    print(f"\n  Per-class sensitivity at L2:")
-    for cls, sens in results["l2"]["per_class_sensitivity"].items():
-        bar = "█" * int(sens * 20)
-        print(f"    {cls:<14}  {sens:.4f}  {bar}")
+    print(f"\n  Per-class F1 at L2:")
+    print(f"    {'Class':<14}  {'F1':>6}  {'Recall':>6}")
+    for cls in results["l2"]["per_class_f1"]:
+        f1   = results["l2"]["per_class_f1"][cls]
+        rec  = results["l2"]["per_class_sensitivity"][cls]
+        bar  = "█" * int(f1 * 20)
+        print(f"    {cls:<14}  {f1:.4f}  {rec:.4f}  {bar}")
 
 
 def main() -> None:

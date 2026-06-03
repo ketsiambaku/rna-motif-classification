@@ -76,6 +76,9 @@ class TrainConfig:
     alpha:          float = 0.25   # L1 topology head
     beta:           float = 0.25   # L2 symmetry head
     gamma:          float = 0.50   # L3 fine-grained head
+    # Class imbalance weighting: 1/count^weight_exponent
+    # 1.0=pure inverse (aggressive), 0.75=moderate, 0.5=inverse-sqrt (mild)
+    weight_exponent: float = 1.0
     # Early stopping
     patience:       int   = 15
     min_delta:      float = 1e-4
@@ -101,8 +104,8 @@ class FlatLoss:
     set counts using inverse weighting.
     """
 
-    def __init__(self, device: str) -> None:
-        weights = RNAMotifDataset.class_weights("l3", split="train").to(device)
+    def __init__(self, device: str, exponent: float = 1.0) -> None:
+        weights = RNAMotifDataset.class_weights("l3", split="train", exponent=exponent).to(device)
         self.ce = nn.CrossEntropyLoss(weight=weights)
 
     def __call__(self, output: torch.Tensor, batch: dict) -> torch.Tensor:
@@ -128,16 +131,17 @@ class HierarchicalLoss:
     def __init__(
         self,
         device: str,
-        alpha: float = 0.25,
-        beta:  float = 0.25,
-        gamma: float = 0.50,
+        alpha:    float = 0.25,
+        beta:     float = 0.25,
+        gamma:    float = 0.50,
+        exponent: float = 1.0,
     ) -> None:
         self.alpha = alpha
         self.beta  = beta
         self.gamma = gamma
-        w1 = RNAMotifDataset.class_weights("l1").to(device)
-        w2 = RNAMotifDataset.class_weights("l2").to(device)
-        w3 = RNAMotifDataset.class_weights("l3").to(device)
+        w1 = RNAMotifDataset.class_weights("l1", exponent=exponent).to(device)
+        w2 = RNAMotifDataset.class_weights("l2", exponent=exponent).to(device)
+        w3 = RNAMotifDataset.class_weights("l3", exponent=exponent).to(device)
         self.ce_l1 = nn.CrossEntropyLoss(weight=w1)
         self.ce_l2 = nn.CrossEntropyLoss(weight=w2)
         self.ce_l3 = nn.CrossEntropyLoss(weight=w3)
@@ -200,8 +204,9 @@ def _make_loaders(cfg: TrainConfig) -> tuple[DataLoader, DataLoader]:
     # large ones in each epoch.
     from collections import Counter
     counts = Counter(r["class"] for r in train_ds.rows)
+    exp    = cfg.weight_exponent
     sample_weights = torch.tensor(
-        [1.0 / counts[r["class"]] for r in train_ds.rows],
+        [1.0 / (counts[r["class"]] ** exp) for r in train_ds.rows],
         dtype=torch.float32,
     )
     sampler = WeightedRandomSampler(
@@ -399,11 +404,11 @@ def train(
             dummy  = torch.zeros(1, 1, 64, 64, 64, device=device)
             sample = model(dummy)
         if isinstance(sample, dict):
-            loss_fn = HierarchicalLoss(device, cfg.alpha, cfg.beta, cfg.gamma)
-            print(f"Loss: HierarchicalLoss  (α={cfg.alpha} β={cfg.beta} γ={cfg.gamma})")
+            loss_fn = HierarchicalLoss(device, cfg.alpha, cfg.beta, cfg.gamma, cfg.weight_exponent)
+            print(f"Loss: HierarchicalLoss  (α={cfg.alpha} β={cfg.beta} γ={cfg.gamma} exp={cfg.weight_exponent})")
         else:
-            loss_fn = FlatLoss(device)
-            print("Loss: FlatLoss (25-class weighted CE)")
+            loss_fn = FlatLoss(device, cfg.weight_exponent)
+            print(f"Loss: FlatLoss (25-class weighted CE, exp={cfg.weight_exponent})")
 
     # --- Optimiser + scheduler ---
     optimizer = torch.optim.Adam(

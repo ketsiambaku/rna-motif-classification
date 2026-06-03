@@ -149,21 +149,26 @@ class RNAMotifDataset(Dataset):
         level: str,
         split: str = "train",
         manifest: Path = DEFAULT_MANIFEST,
+        exponent: float = 1.0,
     ) -> torch.Tensor:
         """Return inverse class weights for CrossEntropyLoss.
 
-        Uses straight inverse weighting (1/count) rather than inverse-sqrt
-        to fully counteract the 290x class imbalance in this dataset.
+        Weight for each class = 1 / count^exponent, normalised to sum to 1.
+
+        exponent=1.0 → pure inverse (fully class-balanced, aggressive)
+        exponent=0.75 → moderate (recommended starting point)
+        exponent=0.5  → inverse-sqrt (mild upweighting of rare classes)
 
         Args:
-            level:  "l1" (3 classes), "l2" (4 classes), or "l3" (25 classes)
-            split:  which split to count from (default "train")
+            level:    "l1" (3 classes), "l2" (4 classes), or "l3" (25 classes)
+            split:    which split to count from (default "train")
+            exponent: controls how aggressively rare classes are upweighted
 
         Returns:
             FloatTensor of shape [num_classes], normalised to sum to 1.
         """
         assert level in ("l1", "l2", "l3"), f"Unknown level: {level!r}"
-        idx_col  = f"{level}_idx"
+        idx_col   = f"{level}_idx"
         n_classes = {"l1": 3, "l2": 4, "l3": 25}[level]
 
         counts = np.zeros(n_classes, dtype=np.float64)
@@ -174,8 +179,8 @@ class RNAMotifDataset(Dataset):
                 idx = int(row[idx_col])
                 counts[idx] += 1
 
-        counts  = np.where(counts == 0, 1, counts)   # avoid division by zero
-        weights = 1.0 / counts                        # inverse weighting
+        counts  = np.where(counts == 0, 1, counts)
+        weights = 1.0 / (counts ** exponent)
         weights /= weights.sum()
         return torch.tensor(weights, dtype=torch.float32)
 

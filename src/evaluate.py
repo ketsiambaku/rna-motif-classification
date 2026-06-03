@@ -154,6 +154,10 @@ def _level_metrics(
         cls: round(report[cls]["recall"], 4)
         for cls in class_names if cls in report
     }
+    per_class_f1 = {
+        cls: round(report[cls]["f1-score"], 4)
+        for cls in class_names if cls in report
+    }
 
     # Macro sensitivity = mean of per-class recall
     macro_sensitivity = round(
@@ -186,6 +190,7 @@ def _level_metrics(
         "macro_specificity":     macro_specificity,
         "macro_auc":             macro_auc,
         "per_class_sensitivity": per_class_sensitivity,
+        "per_class_f1":          per_class_f1,
     }
 
 

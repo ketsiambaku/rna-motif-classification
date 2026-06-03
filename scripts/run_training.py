@@ -35,35 +35,38 @@ def main() -> None:
     parser.add_argument("--batch_size", type=int,   default=None, help="Override batch size.")
     parser.add_argument("--lr",         type=float, default=None, help="Override learning rate.")
     parser.add_argument("--patience",   type=int,   default=None, help="Override early-stopping patience.")
-    parser.add_argument("--run-id",     type=str,   default=None,
+    parser.add_argument("--run-id",          type=str,   default=None,
                         help="Version suffix appended to checkpoint dir, e.g. 'v2' → checkpoints/<model>_v2/.")
+    parser.add_argument("--weight-exponent", type=float, default=None,
+                        help="Class weight exponent: 1.0=inverse, 0.75=moderate, 0.5=inverse-sqrt.")
     args = parser.parse_args()
 
     # ── Model + default config ────────────────────────────────────────────
     if args.model == "cnn_baseline":
         from models.flat_cnn import CNN3DBaseline
         model = CNN3DBaseline()
-        cfg   = TrainConfig(model_name="cnn_baseline", epochs=100, batch_size=32)
+        cfg   = TrainConfig(model_name="cnn_baseline", epochs=100, batch_size=32,
+                            weight_exponent=0.75)
 
     elif args.model == "resnet3d":
         from models.resnet3d import ResNet3DBaseline
         model = ResNet3DBaseline()
-        cfg   = TrainConfig(model_name="resnet3d", epochs=100, batch_size=32)
+        cfg   = TrainConfig(model_name="resnet3d", epochs=100, batch_size=32,
+                            weight_exponent=0.75)
 
     elif args.model == "swin3d":
         from models.swin3d import SwinTransformer3D
         model = SwinTransformer3D()
-        # Transformers need much lower LR than CNNs — 1e-3 causes immediate collapse.
-        # Lower patience too: 20 epochs to allow slower warmup before stopping.
         cfg   = TrainConfig(model_name="swin3d", epochs=100, batch_size=16,
-                            lr=1e-4, patience=20)
+                            lr=1e-4, patience=20, weight_exponent=0.75)
 
     # ── CLI overrides ─────────────────────────────────────────────────────
-    if args.epochs     is not None: cfg.epochs     = args.epochs
-    if args.batch_size is not None: cfg.batch_size = args.batch_size
-    if args.lr         is not None: cfg.lr         = args.lr
-    if args.patience   is not None: cfg.patience   = args.patience
-    if args.run_id     is not None:
+    if args.epochs          is not None: cfg.epochs          = args.epochs
+    if args.batch_size      is not None: cfg.batch_size      = args.batch_size
+    if args.lr              is not None: cfg.lr              = args.lr
+    if args.patience        is not None: cfg.patience        = args.patience
+    if args.weight_exponent is not None: cfg.weight_exponent = args.weight_exponent
+    if args.run_id          is not None:
         cfg.model_name = f"{cfg.model_name}_{args.run_id}"
 
     # ── Print banner ──────────────────────────────────────────────────────
@@ -75,6 +78,7 @@ def main() -> None:
     print(f"  Batch    : {cfg.batch_size}")
     print(f"  LR       : {cfg.lr}")
     print(f"  Patience : {cfg.patience}")
+    print(f"  Wt exp   : {cfg.weight_exponent}  (1.0=inverse  0.75=moderate  0.5=sqrt)")
     print(f"  Device   : {cfg.device}")
     print("=" * 60)
 
