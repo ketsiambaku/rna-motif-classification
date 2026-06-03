@@ -19,11 +19,12 @@
 set -euo pipefail
 
 # ── Validate argument ─────────────────────────────────────────────────────────
-usage() { echo "Usage: bash scripts/deploy.sh [1|2|3]"; exit 1; }
-[[ $# -eq 1 ]] || usage
+usage() { echo "Usage: bash scripts/deploy.sh [1|2|3] [run-id]"; exit 1; }
+[[ $# -ge 1 && $# -le 2 ]] || usage
 [[ "$1" =~ ^[123]$ ]] || usage
 
 IDX=$(( $1 - 1 ))
+RUN_ID="${2:-}"   # optional; e.g. "v2"
 
 # ── Config ────────────────────────────────────────────────────────────────────
 REMOTE_USER="ketsia"
@@ -169,13 +170,15 @@ ok "Data synced"
 _ssh "tmux kill-session -t '$SESSION' 2>/dev/null; true"
 
 info "Launching training in tmux session '$SESSION'..."
+CKPT_NAME="$MODEL${RUN_ID:+_$RUN_ID}"
+RUN_ID_ARG="${RUN_ID:+--run-id $RUN_ID}"
 _ssh "bash -s" <<REMOTE
 set -e
 cd $RDIR
-mkdir -p checkpoints/$MODEL
+mkdir -p checkpoints/$CKPT_NAME
 PYTHON=\$(command -v python3 || command -v python)
 tmux new-session -d -s "$SESSION" \
-    "\$PYTHON scripts/run_training.py --model $MODEL 2>&1 | tee checkpoints/$MODEL/train.log; echo '=== Training finished ==='"
+    "\$PYTHON scripts/run_training.py --model $MODEL $RUN_ID_ARG 2>&1 | tee checkpoints/$CKPT_NAME/train.log; echo '=== Training finished ==='"
 REMOTE
 ok "Training started in tmux session '$SESSION'"
 echo
@@ -187,5 +190,5 @@ ssh -t -o ControlMaster=no -o "ControlPath=$CTRL" "$HOST" "tmux attach -t '$SESS
 echo "────────────────────────────────────────────"
 echo -e "${BOLD}${GREEN}  Detached. Training continues on $SERVER.${NC}"
 echo -e "  Reattach : ssh $HOST → tmux attach -t $SESSION"
-echo -e "  Log      : ssh $HOST 'tail -f $RDIR/checkpoints/$MODEL/train.log'"
-echo -e "  Retrieve : scp $HOST:$RDIR/checkpoints/$MODEL/best.pt ./checkpoints/"
+echo -e "  Log      : ssh $HOST 'tail -f $RDIR/checkpoints/$CKPT_NAME/train.log'"
+echo -e "  Retrieve : rsync -avz $HOST:$RDIR/checkpoints/$CKPT_NAME/ ./checkpoints/$CKPT_NAME/"

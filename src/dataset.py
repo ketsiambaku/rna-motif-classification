@@ -12,7 +12,8 @@ Usage:
     # sample["volume"]   : FloatTensor [1, 64, 64, 64]
     # sample["l1_idx"]   : int  (0-2)
     # sample["l2_idx"]   : int  (0-3)
-    # sample["l3_idx"]   : int  (0-14) or -1 for asymmetric loops
+    # sample["l3_idx"]   : int  (0-24, all 25 classes)
+    # sample["class_idx"]: int  (0-24, == l3_idx)
     # sample["filepath"] : str
 
 Multi-channel upgrade path (when PDB label maps are available):
@@ -20,6 +21,7 @@ Multi-channel upgrade path (when PDB label maps are available):
     [density, backbone, ribose, base] as a 4-channel volume.
 """
 import csv
+import random
 from pathlib import Path
 
 import mrcfile
@@ -71,6 +73,8 @@ class RNAMotifDataset(Dataset):
     def __getitem__(self, idx: int) -> dict:
         row = self.rows[idx]
         volume = self._load_volume(self.root / row["filepath"])
+        if self.split == "train":
+            volume = self._augment(volume)
         return {
             "volume":    volume,
             "l1_idx":    int(row["l1_idx"]),
@@ -78,6 +82,7 @@ class RNAMotifDataset(Dataset):
             "l3_idx":    int(row["l3_idx"]),
             "class_idx": int(row["class_idx"]),
             "filepath":  row["filepath"],
+            "class":     row["class"],
         }
 
     # ------------------------------------------------------------------
@@ -110,6 +115,31 @@ class RNAMotifDataset(Dataset):
         return volume
 
     # ------------------------------------------------------------------
+    # Training augmentation
+    # ------------------------------------------------------------------
+
+    def _augment(self, volume: torch.Tensor) -> torch.Tensor:
+        """Apply random 3D augmentations safe for cryo-EM density maps.
+
+        Rotations: RNA motifs can appear in any orientation in the map, so
+        random 90° rotations in any spatial plane are valid augmentations.
+        Reflections are NOT used — RNA has chirality due to the ribose sugar.
+
+        Noise: small Gaussian noise mimics detector noise variation.
+        """
+        # Random 90° rotation in one of the three spatial planes
+        if random.random() > 0.5:
+            k    = random.randint(1, 3)
+            dims = random.choice([(1, 2), (1, 3), (2, 3)])
+            volume = torch.rot90(volume, k, dims)
+
+        # Small Gaussian noise
+        if random.random() > 0.5:
+            volume = torch.clamp(volume + torch.randn_like(volume) * 0.02, 0.0, 1.0)
+
+        return volume
+
+    # ------------------------------------------------------------------
     # Class-weight utility (used to build weighted loss in training)
     # ------------------------------------------------------------------
 
@@ -120,20 +150,21 @@ class RNAMotifDataset(Dataset):
         split: str = "train",
         manifest: Path = DEFAULT_MANIFEST,
     ) -> torch.Tensor:
-        """
-        Return inverse-sqrt class weights for CrossEntropyLoss.
+        """Return inverse class weights for CrossEntropyLoss.
+
+        Uses straight inverse weighting (1/count) rather than inverse-sqrt
+        to fully counteract the 290x class imbalance in this dataset.
 
         Args:
-            level:  "l1" (3 classes), "l2" (4 classes), or "l3" (15 classes;
-                    asymmetric samples with l3_idx=-1 are excluded from counts)
+            level:  "l1" (3 classes), "l2" (4 classes), or "l3" (25 classes)
             split:  which split to count from (default "train")
 
         Returns:
             FloatTensor of shape [num_classes], normalised to sum to 1.
         """
         assert level in ("l1", "l2", "l3"), f"Unknown level: {level!r}"
-        idx_col = f"{level}_idx"
-        n_classes = {"l1": 3, "l2": 4, "l3": 15}[level]
+        idx_col  = f"{level}_idx"
+        n_classes = {"l1": 3, "l2": 4, "l3": 25}[level]
 
         counts = np.zeros(n_classes, dtype=np.float64)
         with open(manifest, newline="") as f:
@@ -141,12 +172,10 @@ class RNAMotifDataset(Dataset):
                 if row["split"] != split:
                     continue
                 idx = int(row[idx_col])
-                if idx == -1:
-                    continue  # asymmetric loops have no L3 label
                 counts[idx] += 1
 
-        counts = np.where(counts == 0, 1, counts)  # avoid division by zero
-        weights = 1.0 / np.sqrt(counts)
+        counts  = np.where(counts == 0, 1, counts)   # avoid division by zero
+        weights = 1.0 / counts                        # inverse weighting
         weights /= weights.sum()
         return torch.tensor(weights, dtype=torch.float32)
 

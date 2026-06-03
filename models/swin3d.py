@@ -16,7 +16,7 @@ Conditional heads (soft gating, fully differentiable):
   p_L2       = softmax(L2 logits)
 
   L3 input   = concat(features, p_L2)     # 388-dim
-  L3 logits  = Linear(388, 15)            # 15 L3-eligible classes
+  L3 logits  = Linear(388, 25)            # all 25 fine-grained classes
 
 The L1 soft probabilities "gate" L2, and L2 gates L3 — each level's
 uncertainty is propagated forward before the next decision is made.
@@ -341,7 +341,7 @@ class SwinTransformer3D(nn.Module):
         # Conditional heads
         self.head_l1 = nn.Linear(feat_dim,          3)   # topology
         self.head_l2 = nn.Linear(feat_dim + 3,      4)   # + p_L1
-        self.head_l3 = nn.Linear(feat_dim + 4,     15)   # + p_L2
+        self.head_l3 = nn.Linear(feat_dim + 4,     25)   # + p_L2, all 25 classes
 
         self._init_weights()
 
@@ -361,7 +361,7 @@ class SwinTransformer3D(nn.Module):
             x: FloatTensor [B, in_channels, 64, 64, 64]
 
         Returns:
-            dict with keys "l1" [B,3], "l2" [B,4], "l3" [B,15]
+            dict with keys "l1" [B,3], "l2" [B,4], "l3" [B,25]
         """
         x, D, H, W = self.patch_embed(x)        # [B, 16³, 48]
         x = self.pos_drop(x)
@@ -380,12 +380,14 @@ class SwinTransformer3D(nn.Module):
 
         f = x.mean(dim=1)                        # global avg pool → [B, 384]
 
-        # Conditional heads
+        # Conditional heads — soft gating, fully differentiable (no detach).
+        # Gradients flow through the gating probabilities end-to-end so that
+        # downstream supervision improves the upstream head's predictions too.
         l1_logits = self.head_l1(f)
-        p_l1      = F.softmax(l1_logits, dim=-1).detach()   # stop-grad for gating
+        p_l1      = F.softmax(l1_logits, dim=-1)
 
         l2_logits = self.head_l2(torch.cat([f, p_l1], dim=-1))
-        p_l2      = F.softmax(l2_logits, dim=-1).detach()
+        p_l2      = F.softmax(l2_logits, dim=-1)
 
         l3_logits = self.head_l3(torch.cat([f, p_l2], dim=-1))
 
@@ -399,28 +401,19 @@ class SwinTransformer3D(nn.Module):
 
         After predicting L2, zero out L3 logits for classes that are
         impossible given the predicted L2 group:
-          L2=hairpin    → L3 must be hairpin3–7     (indices 0–4)
-          L2=symmetric  → L3 must be 1×1–5×5        (indices 5–9)
-          L2=asymmetric → no L3 prediction
-          L2=bulge      → L3 must be bulge1–5        (indices 10–14)
+          L2=hairpin    → L3 must be hairpin3–7      (indices  0– 4)
+          L2=symmetric  → L3 must be 1×1–5×5         (indices  5– 9)
+          L2=bulge      → L3 must be bulge1–5         (indices 10–14)
+          L2=asymmetric → L3 must be 1×2–4×5         (indices 15–24)
         """
-        # L2 index → valid L3 index range
-        L2_TO_L3 = {
-            0: (0,  5),   # hairpin
-            1: (5, 10),   # symmetric
-            2: None,      # asymmetric — no L3
-            3: (10, 15),  # bulge
-        }
+        from scripts.label_map import L2_IDX_TO_L3_RANGE
         l2_pred   = output["l2"].argmax(1)       # [B]
         l3_logits = output["l3"].clone()
 
         for b in range(l2_pred.size(0)):
-            valid = L2_TO_L3[l2_pred[b].item()]
-            if valid is None:
-                l3_logits[b] = float("-inf")     # mark as undefined
-            else:
-                mask = torch.ones(15, dtype=torch.bool, device=l3_logits.device)
-                mask[valid[0]:valid[1]] = False
-                l3_logits[b, mask] = float("-inf")
+            lo, hi = L2_IDX_TO_L3_RANGE[l2_pred[b].item()]
+            mask = torch.ones(25, dtype=torch.bool, device=l3_logits.device)
+            mask[lo:hi] = False
+            l3_logits[b, mask] = float("-inf")
 
         return {**output, "l3": l3_logits}

@@ -26,7 +26,6 @@ import csv
 import sys
 import time
 from dataclasses import dataclass, field
-from math import sqrt
 from pathlib import Path
 from typing import Optional
 
@@ -99,18 +98,12 @@ class FlatLoss:
     """Cross-entropy loss for M1 (flat 25-class output).
 
     Target is class_idx (0–24). Class weights are derived from training
-    set counts using inverse-sqrt weighting.
+    set counts using inverse weighting.
     """
 
     def __init__(self, device: str) -> None:
-        weights = RNAMotifDataset.class_weights("l3", split="train")
-        # Extend to 25 classes: asymmetric loop classes (indices 15–24) receive
-        # the median L3 weight — they appear in M1's output but have no L3 label,
-        # so their exact weight matters less than avoiding zero.
-        median_w    = weights.median().item()
-        extra       = torch.full((10,), median_w, dtype=torch.float32)
-        all_weights = torch.cat([weights, extra]).to(device)
-        self.ce = nn.CrossEntropyLoss(weight=all_weights)
+        weights = RNAMotifDataset.class_weights("l3", split="train").to(device)
+        self.ce = nn.CrossEntropyLoss(weight=weights)
 
     def __call__(self, output: torch.Tensor, batch: dict) -> torch.Tensor:
         targets = batch["class_idx"].to(output.device)
@@ -145,10 +138,9 @@ class HierarchicalLoss:
         w1 = RNAMotifDataset.class_weights("l1").to(device)
         w2 = RNAMotifDataset.class_weights("l2").to(device)
         w3 = RNAMotifDataset.class_weights("l3").to(device)
-        # ignore_index=-1 silently skips asymmetric samples in L3
         self.ce_l1 = nn.CrossEntropyLoss(weight=w1)
         self.ce_l2 = nn.CrossEntropyLoss(weight=w2)
-        self.ce_l3 = nn.CrossEntropyLoss(weight=w3, ignore_index=-1)
+        self.ce_l3 = nn.CrossEntropyLoss(weight=w3)
 
     def __call__(
         self,
@@ -202,13 +194,14 @@ def _make_loaders(cfg: TrainConfig) -> tuple[DataLoader, DataLoader]:
     train_ds = RNAMotifDataset(split="train")
     val_ds   = RNAMotifDataset(split="val")
 
-    # WeightedRandomSampler: weight each sample by inverse-sqrt of its class count.
-    # Uses the 25-class folder counts so all classes (including asymmetric) are
-    # represented proportionally, independent of which loss head supervises them.
+    # WeightedRandomSampler: weight each sample by inverse class count.
+    # Straight inverse (not sqrt) to fully counteract the 290x imbalance —
+    # ensures scarce classes (e.g. 3x5 with 34 samples) appear as often as
+    # large ones in each epoch.
     from collections import Counter
     counts = Counter(r["class"] for r in train_ds.rows)
     sample_weights = torch.tensor(
-        [1.0 / sqrt(counts[r["class"]]) for r in train_ds.rows],
+        [1.0 / counts[r["class"]] for r in train_ds.rows],
         dtype=torch.float32,
     )
     sampler = WeightedRandomSampler(

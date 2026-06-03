@@ -5,10 +5,9 @@ M2 — 3D ResNet-18 with Hierarchical Multi-Head Loss
 Shared 3D ResNet-18 backbone with three independent classification heads
 trained jointly under the weighted hierarchical loss:
 
-    L = α · CE(L1) + β · CE(L2) + γ · CE(L3, masked)
+    L = α · CE(L1) + β · CE(L2) + γ · CE(L3)
 
-L3 loss is masked so asymmetric loop samples (l3_idx == -1) do not
-contribute to the L3 head gradient — those classes stop at L2.
+L3 covers all 25 classes including asymmetric loops (indices 15-24).
 
 This model returns a dict {"l1", "l2", "l3"} so train.py auto-selects
 HierarchicalLoss.
@@ -24,7 +23,7 @@ Architecture:
 
     Head L1: Dropout → Linear(256,  3)   topology
     Head L2: Dropout → Linear(256,  4)   symmetry
-    Head L3: Dropout → Linear(256, 15)   fine-grained (15 L3-eligible classes)
+    Head L3: Dropout → Linear(256, 25)   fine-grained (all 25 classes)
 
 Future upgrade: set in_channels=4 for label-map input.
 """
@@ -108,7 +107,7 @@ class ResNet3DBaseline(nn.Module):
 
         self.head_l1 = nn.Linear(256,  3)   # hairpin / internal_loop / bulge
         self.head_l2 = nn.Linear(256,  4)   # hairpin / symmetric / asymmetric / bulge
-        self.head_l3 = nn.Linear(256, 15)   # 15 L3-eligible classes
+        self.head_l3 = nn.Linear(256, 25)   # all 25 fine-grained classes
 
     def forward(self, x: torch.Tensor) -> dict[str, torch.Tensor]:
         """
@@ -116,7 +115,7 @@ class ResNet3DBaseline(nn.Module):
             x: FloatTensor [B, in_channels, 64, 64, 64]
 
         Returns:
-            dict with keys "l1" [B,3], "l2" [B,4], "l3" [B,15]
+            dict with keys "l1" [B,3], "l2" [B,4], "l3" [B,25]
         """
         x = self.stem(x)
         x = self.layer1(x)

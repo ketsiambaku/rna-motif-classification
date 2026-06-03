@@ -62,7 +62,7 @@ def _collect_predictions(
     Returns a dict with keys:
         true_l1, pred_l1  — L1 topology indices  (all samples)
         true_l2, pred_l2  — L2 symmetry indices   (all samples)
-        true_l3, pred_l3  — L3 fine-grained indices (L3-eligible samples only)
+        true_l3, pred_l3  — L3 fine-grained indices (all 25 classes, all samples)
         true_cls, pred_cls — flat 25-class indices  (all samples; M1 only)
     """
     l1_map = torch.tensor(CLASS_IDX_TO_L1_IDX, dtype=torch.long)
@@ -101,7 +101,7 @@ def _collect_predictions(
                 for ci in range(25):
                     prob_l1[:, CLASS_IDX_TO_L1_IDX[ci]] += prob_cls[:, ci]
                     prob_l2[:, CLASS_IDX_TO_L2_IDX[ci]] += prob_cls[:, ci]
-                prob_l3  = prob_cls[:, :15]  # class_idx 0-14 == l3_idx 0-14
+                prob_l3  = prob_cls           # all 25 classes; l3_idx == class_idx
 
             true_l1  = batch["l1_idx"]
             true_l2  = batch["l2_idx"]
@@ -117,12 +117,9 @@ def _collect_predictions(
             out["true_cls"].extend(true_cls.tolist())
             out["pred_cls"].extend(pred_cls.tolist())
 
-            # L3: only L3-eligible samples
-            mask = true_l3 != -1
-            if mask.any():
-                out["true_l3"].extend(true_l3[mask].tolist())
-                out["pred_l3"].extend(pred_l3[mask].tolist())
-                out["prob_l3"].extend(prob_l3[mask].tolist())
+            out["true_l3"].extend(true_l3.tolist())
+            out["pred_l3"].extend(pred_l3.tolist())
+            out["prob_l3"].extend(prob_l3.tolist())
 
     return out
 
@@ -278,14 +275,14 @@ def evaluate(
         "n_samples": len(dataset),
         "l1": _level_metrics(preds["true_l1"], preds["pred_l1"], L1_CLASSES),
         "l2": _level_metrics(preds["true_l2"], preds["pred_l2"], L2_CLASSES),
-        "l3": _level_metrics(preds["true_l3"], preds["pred_l3"], L3_CLASSES),
+        "l3": _level_metrics(preds["true_l3"], preds["pred_l3"], ALL25_CLASSES),
     }
 
     # Fill in macro AUC (one-vs-rest) using collected softmax probabilities
     for level, key_true, key_prob, n_cls in [
         ("l1", "true_l1", "prob_l1", 3),
         ("l2", "true_l2", "prob_l2", 4),
-        ("l3", "true_l3", "prob_l3", 15),
+        ("l3", "true_l3", "prob_l3", 25),
     ]:
         try:
             auc = roc_auc_score(
@@ -315,7 +312,7 @@ def evaluate(
     _plot_confusion(preds["true_l2"], preds["pred_l2"], L2_CLASSES,
                     f"L2 Confusion ({split})",
                     output_dir / f"confusion_l2_{split}.png")
-    _plot_confusion(preds["true_l3"], preds["pred_l3"], L3_CLASSES,
+    _plot_confusion(preds["true_l3"], preds["pred_l3"], ALL25_CLASSES,
                     f"L3 Confusion ({split})",
                     output_dir / f"confusion_l3_{split}.png")
 
