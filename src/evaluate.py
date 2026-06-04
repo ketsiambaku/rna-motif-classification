@@ -241,6 +241,100 @@ def _plot_confusion(
 
 
 # ---------------------------------------------------------------------------
+# ROC curve figure
+# ---------------------------------------------------------------------------
+
+def _plot_roc(
+    y_true: list[int],
+    y_prob: list[list[float]],
+    class_names: list[str],
+    title: str,
+    save_path: Path,
+) -> None:
+    from sklearn.metrics import roc_curve
+    from sklearn.preprocessing import label_binarize
+
+    n = len(class_names)
+    y_true_arr  = np.array(y_true)
+    y_prob_arr  = np.array(y_prob)
+    y_bin       = label_binarize(y_true_arr, classes=list(range(n)))
+
+    # Group colours for L3 (25 classes); single colour for L1/L2
+    if n == 25:
+        # hairpin=blue, symmetric=green, asymmetric=purple, bulge=orange
+        group_colors = (
+            ["#2980B9"] * 5 +   # hairpin3-7
+            ["#1E8449"] * 5 +   # 1x1-5x5
+            ["#F39C12"] * 5 +   # bulge1-5
+            ["#7D3C98"] * 10    # 1x2-4x5
+        )
+    else:
+        palette = plt.cm.tab10.colors
+        group_colors = [palette[i % 10] for i in range(n)]
+
+    fig, ax = plt.subplots(figsize=(8, 6))
+
+    # Per-class curves (thin, semi-transparent)
+    for i, cls in enumerate(class_names):
+        if y_bin[:, i].sum() == 0:
+            continue
+        fpr, tpr, _ = roc_curve(y_bin[:, i], y_prob_arr[:, i])
+        auc_i = float(roc_auc_score(y_bin[:, i], y_prob_arr[:, i]))
+        ax.plot(fpr, tpr, lw=0.9, alpha=0.45, color=group_colors[i],
+                label=f"{cls} ({auc_i:.2f})")
+
+    # Macro average curve
+    all_fpr = np.unique(np.concatenate(
+        [roc_curve(y_bin[:, i], y_prob_arr[:, i])[0]
+         for i in range(n) if y_bin[:, i].sum() > 0]
+    ))
+    mean_tpr = np.zeros_like(all_fpr)
+    count = 0
+    for i in range(n):
+        if y_bin[:, i].sum() == 0:
+            continue
+        fpr_i, tpr_i, _ = roc_curve(y_bin[:, i], y_prob_arr[:, i])
+        mean_tpr += np.interp(all_fpr, fpr_i, tpr_i)
+        count += 1
+    mean_tpr /= count
+    macro_auc = float(roc_auc_score(y_bin, y_prob_arr,
+                                    multi_class="ovr", average="macro",
+                                    labels=list(range(n))))
+    ax.plot(all_fpr, mean_tpr, color="black", lw=2.5,
+            label=f"Macro avg (AUC = {macro_auc:.4f})")
+
+    # Diagonal reference
+    ax.plot([0, 1], [0, 1], "k--", lw=0.8, alpha=0.4)
+
+    ax.set(xlim=[0, 1], ylim=[0, 1.02],
+           xlabel="False Positive Rate", ylabel="True Positive Rate",
+           title=title)
+    ax.grid(alpha=0.25)
+
+    # Legend: compact for L3 (too many classes to list individually)
+    if n <= 4:
+        ax.legend(fontsize=8, loc="lower right")
+    elif n <= 15:
+        ax.legend(fontsize=6.5, loc="lower right", ncol=2)
+    else:
+        # For 25 classes show group patches + macro avg only
+        import matplotlib.patches as mpatches
+        handles = [
+            mpatches.Patch(color="#2980B9", label="Hairpin (5 classes)"),
+            mpatches.Patch(color="#1E8449", label="Symmetric (5 classes)"),
+            mpatches.Patch(color="#F39C12", label="Bulge (5 classes)"),
+            mpatches.Patch(color="#7D3C98", label="Asymmetric (10 classes)"),
+            plt.Line2D([0], [0], color="black", lw=2.5,
+                       label=f"Macro avg (AUC = {macro_auc:.4f})"),
+        ]
+        ax.legend(handles=handles, fontsize=9, loc="lower right")
+
+    plt.tight_layout()
+    plt.savefig(save_path, dpi=150)
+    plt.close(fig)
+
+
+# ---------------------------------------------------------------------------
 # Main evaluation entry point
 # ---------------------------------------------------------------------------
 
@@ -320,6 +414,16 @@ def evaluate(
     _plot_confusion(preds["true_l3"], preds["pred_l3"], ALL25_CLASSES,
                     f"L3 Confusion ({split})",
                     output_dir / f"confusion_l3_{split}.png")
+
+    _plot_roc(preds["true_l1"], preds["prob_l1"], L1_CLASSES,
+              f"ROC Curves — L1 Topology ({split})",
+              output_dir / f"roc_l1_{split}.png")
+    _plot_roc(preds["true_l2"], preds["prob_l2"], L2_CLASSES,
+              f"ROC Curves — L2 Symmetry ({split})",
+              output_dir / f"roc_l2_{split}.png")
+    _plot_roc(preds["true_l3"], preds["prob_l3"], ALL25_CLASSES,
+              f"ROC Curves — L3 Fine-grained ({split})",
+              output_dir / f"roc_l3_{split}.png")
 
     # --- Print summary ---
     print(f"\n{'='*55}")
