@@ -319,3 +319,13 @@ rna-motif-classification/
     ├── train.py
     └── evaluate.py
 ```
+
+
+# M1 — gpulab06
+ssh ketsia@gpulab06.uwb.edu "cd /data/ketsia/rna-motif-classification && python3 scripts/run_evaluation.py --model cnn_baseline --checkpoint checkpoints/cnn_baseline_v3/best.pt --split test"
+
+# M2 — gpulab07
+ssh ketsia@gpulab07.uwb.edu "cd /data/ketsia/rna-motif-classification && python3 scripts/run_evaluation.py --model resnet3d --checkpoint checkpoints/resnet3d_v3/best.pt --split test"
+
+# M3 — gpulab08
+ssh ketsia@gpulab08.uwb.edu "cd /data/ketsia/rna-motif-classification && python3 scripts/run_evaluation.py --model swin3d --checkpoint checkpoints/swin3d_v3/best.pt --split test"
