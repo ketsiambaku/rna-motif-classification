@@ -455,7 +455,7 @@ def load_model(
         checkpoint_path: Path to a .pt file saved by train.py.
         device:          Device to load the model onto.
     """
-    ckpt = torch.load(checkpoint_path, map_location=device)
+    ckpt = torch.load(checkpoint_path, map_location=device, weights_only=False)
     model.load_state_dict(ckpt["model_state"])
     model = model.to(device)
     model.eval()

@@ -135,24 +135,24 @@ def draw_m1():
 # ---------------------------------------------------------------------------
 
 def draw_m2():
-    fig, ax = plt.subplots(figsize=(5.5, 12))
-    ax.set_xlim(0, 1.1); ax.set_ylim(0, 12.5)
+    fig, ax = plt.subplots(figsize=(6.0, 14))
+    ax.set_xlim(0, 1.15); ax.set_ylim(0, 14.5)
     ax.axis("off")
-    ax.set_title("M2 — 3D ResNet-18\nHierarchical Multi-Head",
+    ax.set_title("M2 — 3D ResNet-18\nHierarchical Multi-Head + Constrained Decode",
                  fontsize=13, fontweight="bold", pad=10)
 
-    cx = 0.48
-    bw, bh = 0.72, 0.38
+    cx = 0.50
+    bw, bh = 0.76, 0.40
 
     backbone = [
-        (12.0, "Input volume",         "[1 × 64 × 64 × 64]",  "input"),
-        (11.2, "Stem",                 "Conv+BN+ReLU+MaxPool → [32 × 32³]", "conv"),
-        (10.3, "ResBlock × 2",         "32 → 32 ch  [32³]",   "res"),
-        (9.4,  "ResBlock × 2",         "32 → 64 ch  [16³]",   "res"),
-        (8.5,  "ResBlock × 2",         "64 → 128 ch  [8³]",   "res"),
-        (7.6,  "ResBlock × 2",         "128 → 256 ch  [4³]",  "res"),
-        (6.7,  "AdaptiveAvgPool3d(1)", "→ [256]",             "pool"),
-        (5.9,  "Dropout(0.3)",         "",                     "pool"),
+        (13.8, "Input volume",         "[1 × 64 × 64 × 64]",          "input"),
+        (12.9, "Stem",                 "Conv+BN+ReLU+MaxPool → [32 × 32³]", "conv"),
+        (11.9, "ResBlock × 2",         "32 → 32 ch  [32³]",            "res"),
+        (10.9, "ResBlock × 2",         "32 → 64 ch  [16³]",            "res"),
+        (9.9,  "ResBlock × 2",         "64 → 128 ch  [8³]",            "res"),
+        (8.9,  "ResBlock × 2",         "128 → 256 ch  [4³]",           "res"),
+        (7.9,  "AdaptiveAvgPool3d(1)", "→ [256]",                      "pool"),
+        (7.0,  "Dropout(0.3)",         "",                              "pool"),
     ]
 
     for i, (y, lbl, sub, ckey) in enumerate(backbone):
@@ -160,40 +160,92 @@ def draw_m2():
         if i < len(backbone) - 1:
             arrow(ax, cx, y - bh / 2, backbone[i + 1][0] + bh / 2)
 
-    # Three heads side by side
+    # Three independent heads side by side
     heads = [
-        (0.16, "L1 Head\nLinear(256→3)", "hairpin\ninternal_loop\nbulge", "head"),
-        (0.48, "L2 Head\nLinear(256→4)", "hairpin\nsymmetric\nasymmetric\nbulge", "head"),
-        (0.80, "L3 Head\nLinear(256→25)", "all 25\nmotif classes", "head"),
+        (0.15, "L1 Head\nLinear(256→3)",  "hairpin\ninternal_loop\nbulge",      "head"),
+        (0.50, "L2 Head\nLinear(256→4)",  "hairpin / symmetric\nasymmetric / bulge", "head"),
+        (0.85, "L3 Head\nLinear(256→25)", "all 25\nmotif classes",               "head"),
     ]
 
-    # Arrow from dropout to each head
     for hx, _, _, _ in heads:
-        ax.annotate("", xy=(hx, 4.9), xytext=(cx, 5.9 - bh / 2),
-                    arrowprops=dict(arrowstyle="-|>", color="#333",
-                                   lw=1.1, mutation_scale=10,
-                                   connectionstyle="arc3,rad=0.0"), zorder=2)
-
-    for hx, lbl, sub, ckey in heads:
-        box(ax, hx, 4.3, 0.28, 0.7, lbl, sub, COLORS[ckey], fontsize=7.5)
-
-    # Output labels
-    for hx, out_lbl in [(0.16, "3 logits"), (0.48, "4 logits"), (0.80, "25 logits")]:
-        ax.annotate("", xy=(hx, 3.55), xytext=(hx, 3.95),
+        ax.annotate("", xy=(hx, 5.85), xytext=(cx, 7.0 - bh / 2),
                     arrowprops=dict(arrowstyle="-|>", color="#333",
                                    lw=1.1, mutation_scale=10), zorder=2)
-        box(ax, hx, 3.3, 0.28, 0.38, out_lbl, "", COLORS["output"], fontsize=7.5)
 
-    # Layer labels on right
-    for y, label in [(10.3, "Layer 1"), (9.4, "Layer 2"),
-                      (8.5, "Layer 3"), (7.6, "Layer 4")]:
-        ax.text(0.87, y, label, ha="left", va="center",
-                fontsize=7.5, color="#666")
+    for hx, lbl, sub, ckey in heads:
+        box(ax, hx, 5.3, 0.27, 0.72, lbl, sub, COLORS[ckey], fontsize=7.5)
+
+    # Raw logit outputs
+    for hx, out_lbl in [(0.15, "3 logits"), (0.50, "4 logits"), (0.85, "25 logits (raw)")]:
+        ax.annotate("", xy=(hx, 4.55), xytext=(hx, 4.95),
+                    arrowprops=dict(arrowstyle="-|>", color="#333",
+                                   lw=1.0, mutation_scale=9), zorder=2)
+        box(ax, hx, 4.3, 0.27, 0.38, out_lbl, "", COLORS["output"], fontsize=7.0)
+
+    # decode() box — constrained inference
+    DECODE_COLOR = "#FADBD8"
+    DECODE_EDGE  = "#C0392B"
+
+    # Arrow from L2 logits down into decode box
+    ax.annotate("", xy=(0.50, 3.52), xytext=(0.50, 4.12),
+                arrowprops=dict(arrowstyle="-|>", color=DECODE_EDGE,
+                                lw=1.3, mutation_scale=11), zorder=2)
+    # Arrow from L3 raw logits into decode box
+    ax.annotate("", xy=(0.77, 3.52), xytext=(0.85, 4.12),
+                arrowprops=dict(arrowstyle="-|>", color=DECODE_EDGE,
+                                lw=1.3, mutation_scale=11,
+                                connectionstyle="arc3,rad=0.15"), zorder=2)
+
+    decode_rect = FancyBboxPatch((0.25, 2.95), 0.60, 0.55,
+                                  boxstyle="round,pad=0.04",
+                                  linewidth=2.0, edgecolor=DECODE_EDGE,
+                                  facecolor=DECODE_COLOR, zorder=3)
+    ax.add_patch(decode_rect)
+    ax.text(0.55, 3.30, "decode()  — Hard Constraint", ha="center", va="center",
+            fontsize=9, fontweight="bold", color=DECODE_EDGE, zorder=4)
+    ax.text(0.55, 3.08, "argmax(L2) → zero out impossible L3 logits",
+            ha="center", va="center", fontsize=7.5, color="#555", zorder=4)
+
+    # Constraint examples
+    ax.text(0.55, 2.72,
+            "L2=hairpin → keep L3[0:5]   L2=symmetric → keep L3[5:10]\n"
+            "L2=bulge   → keep L3[10:15]  L2=asymmetric → keep L3[15:25]",
+            ha="center", va="center", fontsize=7.0, color="#666",
+            style="italic", zorder=4)
+
+    # Final constrained output
+    ax.annotate("", xy=(0.55, 2.05), xytext=(0.55, 2.65),
+                arrowprops=dict(arrowstyle="-|>", color="#333",
+                                lw=1.2, mutation_scale=10), zorder=2)
+    box(ax, 0.15, 1.6, 0.27, 0.50, "L1 pred", "3 classes", COLORS["output"], fontsize=7.5)
+    box(ax, 0.50, 1.6, 0.27, 0.50, "L2 pred", "4 classes", COLORS["output"], fontsize=7.5)
+    box(ax, 0.85, 1.6, 0.27, 0.50, "L3 pred", "constrained\n25 classes", COLORS["output"], fontsize=7.0)
+
+    for hx in [0.15, 0.85]:
+        ax.annotate("", xy=(hx, 1.85), xytext=(hx, 4.12),
+                    arrowprops=dict(arrowstyle="-|>", color="#AAA",
+                                   lw=1.0, mutation_scale=8,
+                                   connectionstyle="arc3,rad=0.0"), zorder=1)
+
+    # Inference only label
+    ax.text(0.88, 3.22, "inference\nonly", ha="left", va="center",
+            fontsize=7.5, color=DECODE_EDGE, style="italic")
+
+    # Layer labels
+    for y, label in [(11.9, "Layer 1"), (10.9, "Layer 2"),
+                      (9.9,  "Layer 3"), (8.9,  "Layer 4")]:
+        ax.text(0.91, y, label, ha="left", va="center", fontsize=7.5, color="#666")
+
+    # Training note
+    ax.text(0.55, 0.55,
+            "Training: L = 0.25·CE(L1) + 0.25·CE(L2) + 0.50·CE(L3)  — heads independent",
+            ha="center", va="center", fontsize=7.5, color="#555", style="italic")
 
     legend(ax, [
-        ("Residual Block",    COLORS["res"]),
-        ("Pooling / Dropout", COLORS["pool"]),
-        ("Classification head", COLORS["head"]),
+        ("Residual Block",       COLORS["res"]),
+        ("Pooling / Dropout",    COLORS["pool"]),
+        ("Classification head",  COLORS["head"]),
+        ("Constrained decode()", DECODE_COLOR),
     ])
     save(fig, "architecture_m2_resnet.png")
 
